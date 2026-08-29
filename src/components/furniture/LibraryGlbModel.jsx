@@ -1,0 +1,62 @@
+import { useGLTF } from '@react-three/drei'
+import { useMemo } from 'react'
+import { Box3, Color, Vector3 } from 'three'
+
+const WARNING_COLOR = new Color('#ef4444')
+
+export default function LibraryGlbModel({ furniture, asset, warning = false }) {
+  const { scene } = useGLTF(asset.modelUrl)
+  const { model, offset, scale } = useMemo(() => {
+    const cloned = scene.clone(true)
+    const normalization = asset.normalization
+    cloned.rotation.set(
+      normalization.rotationX,
+      normalization.rotationY,
+      normalization.rotationZ,
+      normalization.rotationOrder,
+    )
+    cloned.position.set(normalization.offsetX, normalization.offsetY, normalization.offsetZ)
+    cloned.updateMatrixWorld(true)
+    const bounds = new Box3().setFromObject(cloned)
+    const size = bounds.getSize(new Vector3())
+    const center = bounds.getCenter(new Vector3())
+    const dimensions = furniture.physical.dimensionsM
+
+    cloned.traverse((object) => {
+      if (!object.isMesh) return
+      object.castShadow = true
+      object.receiveShadow = true
+      const materials = Array.isArray(object.material) ? object.material : [object.material]
+      const clonedMaterials = materials.map((material) => {
+        const next = material.clone()
+        if (warning && next.color) next.color.copy(WARNING_COLOR)
+        return next
+      })
+      object.material = Array.isArray(object.material) ? clonedMaterials : clonedMaterials[0]
+    })
+
+    return {
+      model: cloned,
+      offset: [-center.x, -bounds.min.y, -center.z],
+      scale: [
+        dimensions.width / size.x,
+        dimensions.height / size.y,
+        dimensions.depth / size.z,
+      ],
+    }
+  }, [asset.normalization, furniture.physical.dimensionsM, scene, warning])
+
+  return (
+    <group
+      name={`visual-model:${String(furniture.modelStrategy.resolved ?? 'glb').toLowerCase()}-${furniture.semantic.archetype.toLowerCase()}`}
+      scale={scale}
+      userData={{ visualModel: true, strategy: furniture.modelStrategy.resolved, archetype: furniture.semantic.archetype, assetId: asset.id }}
+    >
+      <primitive object={model} position={offset} />
+    </group>
+  )
+}
+
+useGLTF.preload('/assets/furniture/two-seat-sofa.glb')
+useGLTF.preload('/assets/furniture/office-chair.glb')
+useGLTF.preload('/assets/furniture/floor-lamp.glb')

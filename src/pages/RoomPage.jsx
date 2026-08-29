@@ -4,8 +4,13 @@ import { OrbitControls } from '@react-three/drei'
 import { MOUSE } from 'three'
 import { useNavigate } from 'react-router-dom'
 import Room from '../components/Room.jsx'
+import FurnitureInstance from '../components/furniture/FurnitureInstance.jsx'
+import FurnitureInspector from '../components/furniture/FurnitureInspector.jsx'
 import { getExteriorWallsBounds, getWallLength } from '../domain/roomGeometry.js'
+import { createGeometryProxyFromFurniture } from '../domain/spatialContracts.js'
+import { FURNITURE_CATALOG_V0 } from '../data/furnitureCatalog.js'
 import { useSharedRoomDocument } from '../state/useSharedRoomDocument.js'
+import { useSharedFurnitureWorkspace } from '../state/useSharedFurnitureWorkspace.js'
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
@@ -24,9 +29,20 @@ function NumberField({ label, value, min, max, step = 0.01, onChange, suffix = '
 export default function RoomPage() {
   const navigate = useNavigate()
   const { document, dispatch } = useSharedRoomDocument()
+  const furnitureWorkspace = useSharedFurnitureWorkspace()
   const [editWalls, setEditWalls] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
   const bounds = useMemo(() => getExteriorWallsBounds(document.walls), [document.walls])
+  const defaultFurniture = furnitureWorkspace.furnitureItems[0] ?? null
+  const defaultPlacement = defaultFurniture
+    ? Object.values(furnitureWorkspace.effectivePlacementsById).find((placement) => placement.furnitureId === defaultFurniture.id) ?? null
+    : null
+  const inspectorFurniture = furnitureWorkspace.selectedFurniture ?? defaultFurniture
+  const inspectorPlacement = furnitureWorkspace.selectedPlacement ?? defaultPlacement
+  const inspectorGeometryProxy = inspectorFurniture ? createGeometryProxyFromFurniture(inspectorFurniture) : null
+  const inspectorSpatialFacts = inspectorFurniture
+    ? furnitureWorkspace.spatialAnalysis.byFurnitureId[inspectorFurniture.id] ?? null
+    : null
 
   const resizeRoom = (field, value) => dispatch({
     type: 'RESIZE_ROOM',
@@ -53,15 +69,31 @@ export default function RoomPage() {
         <Room
           document={document}
           editWalls={editWalls}
-          onDimensionDrag={(field, value) => resizeRoom(field, clamp(value, field === 'width' ? 4 : 2.5, field === 'width' ? 12 : 8))}
+          onDimensionDrag={(field, value) => resizeRoom(field, clamp(value, field === 'width' ? 2 : 2.5, field === 'width' ? 12 : 8))}
           onDragStateChange={setIsDragging}
         />
+        {furnitureWorkspace.furnitureItems.map((furniture) => {
+          const placement = Object.values(furnitureWorkspace.effectivePlacementsById)
+            .find((item) => item.furnitureId === furniture.id)
+          return placement ? (
+            <FurnitureInstance
+              key={furniture.id}
+              furniture={furniture}
+              placement={placement}
+              selected={furnitureWorkspace.selectedFurnitureId === furniture.id}
+              showGeometryProxy={furnitureWorkspace.showGeometryProxy}
+              spatialFacts={furnitureWorkspace.spatialAnalysis.byFurnitureId[furniture.id] ?? null}
+              dispatchFurnitureCommand={furnitureWorkspace.dispatchInteractionCommand}
+              onDragStateChange={setIsDragging}
+            />
+          ) : null
+        })}
         <gridHelper args={[14, 28, '#809098', '#b2bdc2']} position={[0, 0.005, 0]} />
         <OrbitControls makeDefault enabled={!isDragging} target={[0, 0.8, 0]} enableDamping minDistance={4} maxDistance={20} mouseButtons={{ LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE }} />
       </Canvas>
 
       <div className="room-topbar">
-        <div><strong>3D 小屋</strong><span>正在使用当前 RoomDocument · 墙面朝向观察者时自动透明</span></div>
+        <div><strong>3D 小屋</strong><span>Demo 户型 3.2 × 5.0 × 2.7 m · PARAMETRIC/LIBRARY 已接入 · GENERATED 接口预留</span></div>
         <button className={editWalls ? 'active' : ''} onClick={() => setEditWalls((value) => !value)}>{editWalls ? '墙体拖动：开' : '墙体拖动：关'}</button>
       </div>
 
@@ -84,7 +116,7 @@ export default function RoomPage() {
         <section>
           <h2>房间参数</h2>
           <p className="hint">拖动橙色尺寸手柄时，选中墙与对面墙会同步对称变化；面向观察方向的墙会自动透明。</p>
-          <NumberField label="净宽" value={bounds.width} min={4} max={12} onChange={(value) => resizeRoom('width', value)} />
+          <NumberField label="净宽" value={bounds.width} min={2} max={12} onChange={(value) => resizeRoom('width', value)} />
           <NumberField label="进深" value={bounds.depth} min={2.5} max={8} onChange={(value) => resizeRoom('depth', value)} />
           <NumberField label="层高" value={document.room.defaults.wallHeight} min={2.2} max={4} onChange={(wallHeight) => dispatch({ type: 'UPDATE_WALL_DEFAULTS', patch: { wallHeight } })} />
           <NumberField label="墙厚（模拟）" value={document.room.defaults.wallThickness} min={0.08} max={0.35} onChange={(wallThickness) => dispatch({ type: 'UPDATE_WALL_DEFAULTS', patch: { wallThickness } })} />
@@ -104,9 +136,20 @@ export default function RoomPage() {
           })}
           {document.openings.length === 0 && <p className="hint">当前户型没有门窗，可返回 2D 编辑器添加。</p>}
         </section>
+        <FurnitureInspector
+          furnitureItems={furnitureWorkspace.furnitureItems}
+          furniture={inspectorFurniture}
+          placement={inspectorPlacement}
+          geometryProxy={inspectorGeometryProxy}
+          spatialFacts={inspectorSpatialFacts}
+          selected={Boolean(furnitureWorkspace.selectedFurniture)}
+          showGeometryProxy={furnitureWorkspace.showGeometryProxy}
+          dispatchFurnitureCommand={furnitureWorkspace.dispatchInteractionCommand}
+          catalogItems={FURNITURE_CATALOG_V0}
+        />
         <button className="reset-button" onClick={() => navigate('/floorplan')}>返回编辑户型</button>
       </aside>
-      <div className="legend"><span className="orange-dot" />拖动橙色尺寸手柄可对称伸缩 · 右键旋转视角 · 滚轮缩放</div>
+      <div className="legend"><span className="orange-dot" />家具左键拖动 · Shift/右键拖家具旋转 · 橙色手柄改房间 · 滚轮缩放</div>
     </main>
   )
 }

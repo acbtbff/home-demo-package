@@ -70,3 +70,50 @@ button.active { border-color: #c97800; color: #7a4700; background: #fff4d6; }
 .room-sidebar-divider { height: 1px; margin: 8px 4px; background: #e1e6e8; }
 .room-editor-panel { right: 18px; }
 @media (max-width: 780px) { .app-header { padding: 0 12px; } .app-nav { gap: 0; } .app-nav-link { padding: 8px 7px; font-size: 11px; } .home-page { width: min(100% - 36px, 540px); justify-content: center; } .home-preview { display: none; } .room-sidebar { top: auto; bottom: 18px; left: 18px; right: 18px; width: auto; flex-direction: row; flex-wrap: wrap; } .room-sidebar-title, .room-sidebar-divider { display: none; } .room-sidebar button { flex: 1; text-align: center; } }
+
+/* Furniture Runtime V0 */
+.debug-toggle { display: flex; align-items: center; gap: 9px; margin: 12px 0 8px; color: #526168; font-size: 13px; }
+.debug-toggle input { width: 16px; height: 16px; accent-color: #d98200; }
+.geometry-proxy-readout { margin: 8px 0 0; padding: 8px 10px; border: 1px solid #c5e1e8; border-radius: 7px; color: #356a78; background: #eef9fb; font-size: 11px; line-height: 1.5; }
+.furniture-list { display: grid; grid-template-columns: 1fr; gap: 7px; margin-top: 10px; }
+.furniture-list button { width: 100%; text-align: left; }
+
+.furniture-page { width: min(1180px, calc(100% - 64px)); height: 100%; margin: 0 auto; padding: 44px 0 80px; overflow-y: auto; color: #273238; }
+.furniture-page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 36px; }
+.furniture-page-header h1 { margin: 10px 0 8px; font-size: 44px; font-weight: 500; letter-spacing: -.04em; }
+.furniture-page-header p { max-width: 680px; margin: 0; color: #748188; line-height: 1.7; }
+.furniture-room-action { border-color: #d98200; color: #fff; background: #d98200; }
+.furniture-room-action:hover { color: #fff; background: #bd6f00; }
+.furniture-section { margin-top: 30px; }
+.furniture-section + .furniture-section { padding-top: 30px; border-top: 1px solid #e0e5e6; }
+.furniture-section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 16px; }
+.furniture-section-heading h2 { margin: 0 0 5px; font-size: 20px; }
+.furniture-section-heading p { margin: 0; color: #7b878d; font-size: 13px; line-height: 1.6; }
+.furniture-section-heading > strong { color: #bd7410; font-size: 24px; }
+.furniture-catalog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.furniture-catalog-card { display: flex; min-height: 230px; flex-direction: column; padding: 18px; border: 1px solid #e0e5e6; border-radius: 16px; background: #fff; box-shadow: 0 8px 24px rgba(42,55,62,.06); }
+.furniture-catalog-card h3 { margin: 18px 0 6px; font-size: 18px; }
+.furniture-catalog-card p { margin: 0 0 8px; color: #78858b; font-size: 12px; }
+.furniture-catalog-card small { min-height: 42px; color: #8d989d; line-height: 1.55; }
+.furniture-catalog-card button { margin-top: auto; }
+.furniture-catalog-card button:disabled { cursor: not-allowed; opacity: .55; }
+.furniture-pending-card { border-style: dashed; background: #fbfaf7; }
+.strategy-badge { align-self: flex-start; padding: 5px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+.strategy-parametric { color: #6b4c17; background: #fff2cf; }
+.strategy-library { color: #356a78; background: #e9f7fa; }
+.strategy-generated { color: #705485; background: #f3eefa; }
+.furniture-owned-list { display: grid; gap: 10px; }
+.furniture-owned-row { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(260px, 1.5fr) auto; align-items: center; gap: 20px; padding: 14px 16px; border: 1px solid #e1e6e8; border-radius: 12px; background: #fff; }
+.furniture-owned-row > div:first-child { display: flex; flex-direction: column; gap: 4px; }
+.furniture-owned-row > div:first-child span { color: #839096; font-size: 11px; }
+.furniture-owned-meta { display: flex; flex-wrap: wrap; gap: 7px; }
+.furniture-owned-meta span { padding: 5px 7px; border-radius: 7px; color: #647279; background: #f2f5f5; font-size: 10px; }
+.furniture-owned-actions { display: flex; gap: 7px; }
+.furniture-empty { margin: 0; padding: 24px; border: 1px dashed #d6dcde; border-radius: 12px; color: #839096; text-align: center; }
+
+@media (max-width: 840px) {
+  .furniture-page { width: min(100% - 32px, 640px); padding-top: 28px; }
+  .furniture-page-header { align-items: flex-start; flex-direction: column; }
+  .furniture-owned-row { grid-template-columns: 1fr; gap: 10px; }
+  .furniture-owned-actions { justify-content: flex-start; }
+}

@@ -11,7 +11,8 @@
     "vision:server": "node server/photoVisionServer.mjs",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:contracts": "node --test tests/*.test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

@@ -44,36 +44,23 @@ export function legacyDemoToRoomDocument({ room, openings }) {
         start: { x: -halfWidth, z: halfDepth }, end: { x: -halfWidth, z: -halfDepth },
         height: wallHeight, thickness, kind: 'exterior', materialId: 'wall-default',
       },
-      {
-        id: 'wall-bath-01', roomId: 'room-01',
-        start: { x: halfWidth - 1.35, z: -halfDepth + 0.375 },
-        end: { x: halfWidth - 1.35, z: -halfDepth + 1.925 },
-        height: wallHeight, thickness, kind: 'partition', materialId: 'wall-bathroom',
-      },
-      {
-        id: 'wall-bath-02', roomId: 'room-01',
-        start: { x: halfWidth - 1.395, z: -halfDepth + 1.9 },
-        end: { x: halfWidth + 0.055, z: -halfDepth + 1.9 },
-        height: wallHeight, thickness, kind: 'partition', materialId: 'wall-bathroom',
-      },
     ],
     openings: [
       {
-        id: 'door-entry', type: 'door', wallId: 'wall-east',
-        offset: Number((openings.door.center + halfDepth).toFixed(6)),
+        id: 'door-entry', type: 'door', wallId: openings.door.wallId ?? 'wall-south',
+        offset: openings.door.offset ?? 0.65,
         width: openings.door.width, height: openings.door.height,
         sillHeight: openings.door.sill ?? 0,
       },
       {
-        id: 'window-main', type: 'window', wallId: 'wall-west',
-        offset: Number((halfDepth - openings.window.center).toFixed(6)),
+        id: 'window-main', type: 'window', wallId: openings.window.wallId ?? 'wall-north',
+        offset: openings.window.offset ?? halfWidth,
         width: openings.window.width, height: openings.window.height,
         sillHeight: openings.window.sill ?? 0,
       },
     ],
     materials: [
       { id: 'wall-default', color: '#eee9df' },
-      { id: 'wall-bathroom', color: '#e4ded3' },
     ],
   }
 }

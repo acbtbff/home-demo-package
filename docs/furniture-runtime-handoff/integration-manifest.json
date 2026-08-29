@@ -1,0 +1,72 @@
+{
+  "baseline": {
+    "repoUrl": null,
+    "branch": "baseline/demo-room-v0",
+    "commit": null,
+    "commitRef": "refs/heads/baseline/demo-room-v0",
+    "canonicalDefinition": "HEAD of baseline/demo-room-v0",
+    "initialFreezeCommit": "830307ecff2347afef4b21139fde2f4f6628c17b",
+    "identityResolutionBaseCommit": "c0c4a94920c1e1bfe81d1aeb7ceb4437e502f961",
+    "status": "FROZEN_LOCAL_HEAD"
+  },
+  "repository": {
+    "root": "C:\\Users\\lx\\Desktop\\claude\\rental-home-demo",
+    "status": "STANDALONE_LOCAL",
+    "remoteStatus": "REMOTE_NOT_CONFIGURED"
+  },
+  "date": "2026-08-29",
+  "units": "meter",
+  "coordinateSystem": {
+    "up": "Y",
+    "floorPlane": ["X", "Z"]
+  },
+  "pivot": "bottom-center",
+  "rotationAxis": "Y",
+  "webAssetFormat": "GLB",
+  "canonicalPhysicalDimensions": "Furniture.physical.dimensionsM",
+  "geometryProxyRole": "spatial_truth",
+  "visualModelRole": "visual_only",
+  "validatedStrategies": [
+    "PARAMETRIC",
+    "LIBRARY"
+  ],
+  "validatedFurniture": [
+    {
+      "archetype": "DESK",
+      "strategy": "PARAMETRIC",
+      "implementation": "PRESENT",
+      "browserValidation": "VALIDATED"
+    },
+    {
+      "archetype": "TWO_SEAT_SOFA",
+      "strategy": "LIBRARY",
+      "implementation": "READY",
+      "browserValidation": "VALIDATED"
+    },
+    {
+      "archetype": "OFFICE_CHAIR",
+      "strategy": "LIBRARY",
+      "implementation": "READY",
+      "browserValidation": "PARTIAL_FLOOR_CONTACT_OPEN"
+    },
+    {
+      "archetype": "FLOOR_LAMP",
+      "strategy": "LIBRARY",
+      "implementation": "READY",
+      "browserValidation": "VALIDATED"
+    }
+  ],
+  "collisionPolicy": {
+    "furnitureFurniture": "HARD_BLOCK",
+    "furnitureExteriorWall": "HARD_BLOCK",
+    "outOfBounds": "HARD_BLOCK",
+    "furnitureInteriorPartitionWall": "SOFT_ALLOW_RED_WARNING"
+  },
+  "knownIssues": [
+    {
+      "id": "OFFICE_CHAIR_VISUAL_FLOOR_GAP",
+      "status": "OPEN"
+    }
+  ],
+  "nextIntegrationBranch": "integration/furniture-runtime-v0"
+}

@@ -6,7 +6,7 @@ import { applyCozyMaterial } from '../../styles/cozy/cozyMaterial.js'
 
 const WARNING_COLOR = new Color('#ef4444')
 
-export default function LibraryGlbModel({ furniture, asset, warning = false, styleMode = 'ORIGINAL' }) {
+export default function LibraryGlbModel({ furniture, asset, warning = false, styleMode = 'ORIGINAL', wishlist = false }) {
   const { scene } = useGLTF(asset.modelUrl)
   const { model, offset, scale, aspectRatioWarning } = useMemo(() => {
     const cloned = scene.clone(true)
@@ -36,6 +36,7 @@ export default function LibraryGlbModel({ furniture, asset, warning = false, sty
       const clonedMaterials = materials.map((material) => {
         const next = material.clone()
         if (warning && next.color) next.color.copy(WARNING_COLOR)
+        if (wishlist) { next.transparent = true; next.opacity = 0.64; next.depthWrite = false }
         return next
       })
       object.material = Array.isArray(object.material) ? clonedMaterials : clonedMaterials[0]
@@ -48,7 +49,7 @@ export default function LibraryGlbModel({ furniture, asset, warning = false, sty
       scale: calibration.scale ?? [1, 1, 1],
       aspectRatioWarning: calibration.severeAspectMismatch,
     }
-  }, [asset.normalization, furniture.physical.dimensionsM, scene, warning, styleMode])
+  }, [asset.normalization, furniture.physical.dimensionsM, scene, warning, styleMode, wishlist])
 
   return (
     <group

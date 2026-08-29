@@ -106,7 +106,9 @@ export default function FurnitureInspector({
   return (
     <section>
       <h2>{furniture.name}</h2>
-      <p className="hint">{furniture.semantic.category} · {furniture.semantic.archetype} · {furniture.modelStrategy.resolved}</p>
+      <p className="hint">{furniture.semantic.category} · {furniture.semantic.archetype} · {furniture.modelStrategy.resolved} · {furniture.lifecycle.status === 'WISHLIST' ? '想购买' : furniture.lifecycle.status}</p>
+      {furniture.product?.price != null && <p className="geometry-proxy-readout">价格：¥{furniture.product.price}</p>}
+      {furniture.product?.url && <p className="hint">商品来源：{furniture.product.url}</p>}
       <button className="active" onClick={toggleSelection}>取消选中</button>
       <button onClick={() => dispatchFurnitureCommand(createRemoveFurnitureCommand(furniture.id))}>Remove</button>
       <CmField label="宽度" valueM={furniture.physical.dimensionsM.width} minCm={60} maxCm={300} onChange={(width) => updateDimensions({ width })} />

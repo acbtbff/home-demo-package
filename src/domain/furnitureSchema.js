@@ -25,6 +25,12 @@ const nullablePositiveNumber = (value) => {
   const number = Number(value)
   return Number.isFinite(number) && number > 0 ? number : null
 }
+const normalizeProduct = (value = {}) => ({
+  name: nullableString(value.name),
+  price: nullablePositiveNumber(value.price),
+  url: nullableString(value.url),
+  imagePreview: nullableString(value.imagePreview),
+})
 
 const normalizeStatusToken = (value) => {
   if (value == null || value === '') return null
@@ -113,6 +119,7 @@ export function createFurniture(input = {}) {
       status: (modelStrategy.resolved ?? defaultModelStrategy.preferred) === 'GENERATED' ? 'PENDING_GENERATION' : 'READY',
     },
     intakeMetadata: input.intakeMetadata ?? null,
+    product: normalizeProduct(input.product),
   }
 
   return furniture

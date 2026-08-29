@@ -6,7 +6,7 @@ export default function FurnitureVisualModel({ furniture, warning = false, style
   if (!furniture) return null
 
   if (furniture.modelStrategy.resolved === 'PARAMETRIC' && furniture.semantic.archetype === 'DESK') {
-    return <ParametricDesk dimensionsM={furniture.physical.dimensionsM} warning={warning} styleMode={styleMode} />
+    return <ParametricDesk dimensionsM={furniture.physical.dimensionsM} warning={warning} styleMode={styleMode} wishlist={furniture.lifecycle?.status === 'WISHLIST'} />
   }
 
   if (furniture.modelStrategy.resolved === 'LIBRARY' || furniture.modelStrategy.resolved === 'GENERATED') {
@@ -15,7 +15,7 @@ export default function FurnitureVisualModel({ furniture, warning = false, style
       ? OFFICE_CHAIR_COZY_GEOMETRY_ASSET_V0
       : resolved.asset
     if (asset?.modelUrl?.endsWith('.glb')) {
-      return <LibraryGlbModel furniture={furniture} asset={asset} warning={warning} styleMode={styleMode} />
+      return <LibraryGlbModel furniture={furniture} asset={asset} warning={warning} styleMode={styleMode} wishlist={furniture.lifecycle?.status === 'WISHLIST'} />
     }
   }
 

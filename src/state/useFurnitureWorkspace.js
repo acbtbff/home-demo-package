@@ -44,6 +44,18 @@ function updateFurnitureDimensions(furniture, patch) {
     },
   }
 }
+function updateFurnitureInfo(furniture, patch) {
+  const dimensionsM = patch.dimensionsM ? { ...furniture.physical.dimensionsM, ...patch.dimensionsM } : furniture.physical.dimensionsM
+  return {
+    ...furniture,
+    name: patch.name ?? furniture.name,
+    physical: { ...furniture.physical, dimensionsM },
+    ownership: patch.ownershipType ? { ...furniture.ownership, type: patch.ownershipType } : furniture.ownership,
+    lifecycle: patch.lifecycleStatus ? { ...furniture.lifecycle, status: patch.lifecycleStatus } : furniture.lifecycle,
+    product: patch.product ? { ...furniture.product, ...patch.product } : furniture.product,
+    intakeMetadata: patch.intakeMetadata ? { ...furniture.intakeMetadata, ...patch.intakeMetadata } : furniture.intakeMetadata,
+  }
+}
 
 function isPlacementAllowed({ roomDocument, state, furnitureId, candidatePlacementsById }) {
   const furnitureItems = Object.values(state.furnitureById)
@@ -263,6 +275,16 @@ export function reduceFurnitureWorkspace(state, command, roomDocument = null) {
           [furniture.id]: updateFurnitureDimensions(furniture, command.patch ?? {}),
         },
       }
+    }
+    case FURNITURE_COMMAND_TYPES.UPDATE_FURNITURE_INFO: {
+      const furniture = state.furnitureById[command.furnitureId]
+      if (!furniture) return state
+      return { ...state, furnitureById: { ...state.furnitureById, [furniture.id]: updateFurnitureInfo(furniture, command.patch ?? {}) } }
+    }
+    case FURNITURE_COMMAND_TYPES.PURCHASE_FURNITURE: {
+      const furniture = state.furnitureById[command.furnitureId]
+      if (!furniture || furniture.ownership.type !== 'NONE' || furniture.lifecycle.status !== 'WISHLIST') return state
+      return { ...state, furnitureById: { ...state.furnitureById, [furniture.id]: { ...furniture, ownership: { ...furniture.ownership, type: 'USER' }, lifecycle: { ...furniture.lifecycle, status: 'OWNED' } } } }
     }
     case FURNITURE_COMMAND_TYPES.TOGGLE_GEOMETRY_PROXY:
       return { ...state, showGeometryProxy: command.show }

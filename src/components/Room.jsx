@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { Plane, Vector3 } from 'three'
 import { getExteriorWallsBounds } from '../domain/roomGeometry.js'
 import WallSegment from './WallSegment.jsx'
+import { COZY_V0_PALETTE } from '../styles/cozy/cozyPalette.js'
 
 const floorPlane = new Plane(new Vector3(0, 1, 0), 0)
 
@@ -45,7 +46,7 @@ function ResizeHandle({ axis, position, onResize, onDragStateChange }) {
   )
 }
 
-function Room({ document, editWalls, onDimensionDrag, onDragStateChange }) {
+function Room({ document, editWalls, onDimensionDrag, onDragStateChange, styleMode = 'ORIGINAL' }) {
   const bounds = getExteriorWallsBounds(document.walls)
   const floorThickness = document.room.floorThickness
   const materials = new Map(document.materials.map((material) => [material.id, material]))
@@ -58,7 +59,7 @@ function Room({ document, editWalls, onDimensionDrag, onDragStateChange }) {
         receiveShadow
       >
         <boxGeometry args={[bounds.width + floorThickness * 2, floorThickness, bounds.depth + floorThickness * 2]} />
-        <meshStandardMaterial color="#d8c4a8" roughness={0.92} metalness={0} />
+        <meshStandardMaterial color={styleMode === 'COZY_V0' ? COZY_V0_PALETTE.WARM_GRAY : '#d8c4a8'} roughness={0.92} metalness={0} />
       </mesh>
 
       {document.walls.map((wall) => (
@@ -66,8 +67,9 @@ function Room({ document, editWalls, onDimensionDrag, onDragStateChange }) {
           key={wall.id}
           wall={wall}
           openings={document.openings.filter((opening) => opening.wallId === wall.id)}
-          color={materials.get(wall.materialId)?.color ?? '#eee9df'}
+          color={styleMode === 'COZY_V0' ? COZY_V0_PALETTE.WARM_WHITE : (materials.get(wall.materialId)?.color ?? '#eee9df')}
           roomCenter={{ x: bounds.centerX, z: bounds.centerZ }}
+          styleMode={styleMode}
         />
       ))}
 

@@ -22,6 +22,7 @@ export default function FurnitureInstance({
   spatialFacts = null,
   dispatchFurnitureCommand,
   onDragStateChange,
+  styleMode = 'ORIGINAL',
 }) {
   const dragRef = useRef(null)
   const geometryProxy = createGeometryProxyFromFurniture(furniture)
@@ -99,7 +100,7 @@ export default function FurnitureInstance({
         ]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-      <FurnitureVisualModel furniture={furniture} warning={Boolean(spatialFacts?.interiorWallCollision)} />
+      <FurnitureVisualModel furniture={furniture} warning={Boolean(spatialFacts?.interiorWallCollision)} styleMode={styleMode} />
       {showGeometryProxy && (
         <GeometryProxyBox
           geometryProxy={geometryProxy}

@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { getWallAngle, getWallCenter, getWallLength } from '../domain/roomGeometry.js'
+import { COZY_V0_PALETTE } from '../styles/cozy/cozyPalette.js'
 
 function WallBox({ center, span, height, thickness, color, materialRef }) {
   if (span <= 0.001 || height <= 0.001) return null
@@ -55,7 +56,7 @@ function wallParts(wall, openings) {
 }
 
 /** Generic wall renderer. Local X follows wall.start -> wall.end. */
-function WallSegment({ wall, openings, color, roomCenter = { x: 0, z: 0 } }) {
+function WallSegment({ wall, openings, color, roomCenter = { x: 0, z: 0 }, styleMode = 'ORIGINAL' }) {
   const materialsRef = useRef([])
   const length = getWallLength(wall)
   const center = getWallCenter(wall)
@@ -100,7 +101,7 @@ function WallSegment({ wall, openings, color, roomCenter = { x: 0, z: 0 } }) {
           position={[-length / 2 + opening.offset, opening.sillHeight + opening.height / 2, 0]}
         >
           <boxGeometry args={[opening.width, opening.height, wall.thickness * 0.35]} />
-          <meshPhysicalMaterial color="#bde3f2" transparent opacity={0.42} roughness={0.1} />
+          <meshPhysicalMaterial color={styleMode === 'COZY_V0' ? COZY_V0_PALETTE.DUSTY_BLUE : '#bde3f2'} transparent opacity={0.42} roughness={0.1} />
         </mesh>
       ))}
     </group>

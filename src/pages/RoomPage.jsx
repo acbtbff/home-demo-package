@@ -11,6 +11,7 @@ import { createGeometryProxyFromFurniture } from '../domain/spatialContracts.js'
 import { FURNITURE_CATALOG_V0 } from '../data/furnitureCatalog.js'
 import { useSharedRoomDocument } from '../state/useSharedRoomDocument.js'
 import { useSharedFurnitureWorkspace } from '../state/useSharedFurnitureWorkspace.js'
+import CozyLighting from '../styles/cozy/CozyLighting.jsx'
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
@@ -32,6 +33,7 @@ export default function RoomPage() {
   const furnitureWorkspace = useSharedFurnitureWorkspace()
   const [editWalls, setEditWalls] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
+  const [styleMode, setStyleMode] = useState('ORIGINAL')
   const bounds = useMemo(() => getExteriorWallsBounds(document.walls), [document.walls])
   const defaultFurniture = furnitureWorkspace.furnitureItems[0] ?? null
   const defaultPlacement = defaultFurniture
@@ -63,14 +65,14 @@ export default function RoomPage() {
   return (
     <main className="app-shell room-page">
       <Canvas shadows camera={{ position: [8.8, 7.2, 8.8], fov: 42, near: 0.1, far: 100 }} dpr={[1, 2]}>
-        <color attach="background" args={['#cfd9dd']} />
-        <ambientLight intensity={0.8} />
-        <directionalLight castShadow position={[4, 9, 6]} intensity={1.5} shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
+        <color attach="background" args={[styleMode === 'COZY_V0' ? '#F2EFE8' : '#cfd9dd']} />
+        {styleMode === 'COZY_V0' ? <CozyLighting /> : <><ambientLight intensity={0.8} /><directionalLight castShadow position={[4, 9, 6]} intensity={1.5} shadow-mapSize-width={2048} shadow-mapSize-height={2048} /></>}
         <Room
           document={document}
           editWalls={editWalls}
           onDimensionDrag={(field, value) => resizeRoom(field, clamp(value, field === 'width' ? 2 : 2.5, field === 'width' ? 12 : 8))}
           onDragStateChange={setIsDragging}
+          styleMode={styleMode}
         />
         {furnitureWorkspace.furnitureItems.map((furniture) => {
           const placement = Object.values(furnitureWorkspace.effectivePlacementsById)
@@ -85,6 +87,7 @@ export default function RoomPage() {
               spatialFacts={furnitureWorkspace.spatialAnalysis.byFurnitureId[furniture.id] ?? null}
               dispatchFurnitureCommand={furnitureWorkspace.dispatchInteractionCommand}
               onDragStateChange={setIsDragging}
+              styleMode={styleMode}
             />
           ) : null
         })}
@@ -94,6 +97,7 @@ export default function RoomPage() {
 
       <div className="room-topbar">
         <div><strong>3D 小屋</strong><span>Demo 户型 3.2 × 5.0 × 2.7 m · PARAMETRIC/LIBRARY 已接入 · GENERATED 接口预留</span></div>
+        <button className="active" type="button" onClick={() => setStyleMode((value) => value === 'COZY_V0' ? 'ORIGINAL' : 'COZY_V0')}>Style: {styleMode}</button>
         <button className={editWalls ? 'active' : ''} onClick={() => setEditWalls((value) => !value)}>{editWalls ? '墙体拖动：开' : '墙体拖动：关'}</button>
       </div>
 

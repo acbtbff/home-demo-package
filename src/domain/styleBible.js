@@ -2,20 +2,9 @@ export const STYLE_FAMILIES = Object.freeze({
   COZY_V0: 'COZY_V0',
 })
 
-export const COZY_V0_PALETTE = Object.freeze({
-  WARM_WHITE: '#f6f0e7',
-  CREAM: '#eadfcf',
-  LIGHT_WOOD: '#caa978',
-  DARK_WOOD: '#6f5438',
-  SAGE: '#8fa58d',
-  DUSTY_BLUE: '#7897a8',
-  TERRACOTTA: '#b86f4b',
-  BUTTER_YELLOW: '#e7c76e',
-  WARM_GRAY: '#9a9288',
-  CHARCOAL: '#343536',
-  CLAY: '#a9826a',
-  SOFT_BLACK: '#242424',
-})
+import { COZY_V0_PALETTE } from '../styles/cozy/cozyPalette.js'
+
+export { COZY_V0_PALETTE }
 
 export const STYLE_BIBLE_V0 = Object.freeze({
   id: STYLE_FAMILIES.COZY_V0,

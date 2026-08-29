@@ -2,10 +2,11 @@ import { useGLTF } from '@react-three/drei'
 import { useMemo } from 'react'
 import { Box3, Color, Vector3 } from 'three'
 import { calculateLibraryVisualCalibration } from '../../domain/furnitureAssets.js'
+import { applyCozyMaterial } from '../../styles/cozy/cozyMaterial.js'
 
 const WARNING_COLOR = new Color('#ef4444')
 
-export default function LibraryGlbModel({ furniture, asset, warning = false }) {
+export default function LibraryGlbModel({ furniture, asset, warning = false, styleMode = 'ORIGINAL' }) {
   const { scene } = useGLTF(asset.modelUrl)
   const { model, offset, scale, aspectRatioWarning } = useMemo(() => {
     const cloned = scene.clone(true)
@@ -39,6 +40,7 @@ export default function LibraryGlbModel({ furniture, asset, warning = false }) {
       })
       object.material = Array.isArray(object.material) ? clonedMaterials : clonedMaterials[0]
     })
+    if (styleMode === 'COZY_V0') applyCozyMaterial(cloned)
 
     return {
       model: cloned,
@@ -46,7 +48,7 @@ export default function LibraryGlbModel({ furniture, asset, warning = false }) {
       scale: calibration.scale ?? [1, 1, 1],
       aspectRatioWarning: calibration.severeAspectMismatch,
     }
-  }, [asset.normalization, furniture.physical.dimensionsM, scene, warning])
+  }, [asset.normalization, furniture.physical.dimensionsM, scene, warning, styleMode])
 
   return (
     <group

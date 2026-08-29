@@ -10,6 +10,7 @@ export const FURNITURE_COMMAND_TYPES = Object.freeze({
   MOVE_FURNITURE: 'MOVE_FURNITURE',
   ROTATE_FURNITURE_Y: 'ROTATE_FURNITURE_Y',
   UPDATE_FURNITURE_DIMENSIONS: 'UPDATE_FURNITURE_DIMENSIONS',
+  UPDATE_FURNITURE_COLOR_VARIANT: 'UPDATE_FURNITURE_COLOR_VARIANT',
   TOGGLE_GEOMETRY_PROXY: 'TOGGLE_GEOMETRY_PROXY',
   ADD_FURNITURE: 'ADD_FURNITURE',
   REMOVE_FURNITURE: 'REMOVE_FURNITURE',
@@ -64,6 +65,14 @@ export function createUpdateFurnitureDimensionsCommand({ furnitureId, patch = {}
     type: FURNITURE_COMMAND_TYPES.UPDATE_FURNITURE_DIMENSIONS,
     furnitureId,
     patch,
+  }
+}
+
+export function createUpdateFurnitureColorVariantCommand({ furnitureId, colorVariantId = null } = {}) {
+  return {
+    type: FURNITURE_COMMAND_TYPES.UPDATE_FURNITURE_COLOR_VARIANT,
+    furnitureId,
+    colorVariantId,
   }
 }
 

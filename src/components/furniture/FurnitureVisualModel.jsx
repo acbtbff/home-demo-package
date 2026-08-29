@@ -6,7 +6,7 @@ export default function FurnitureVisualModel({ furniture, warning = false, style
   if (!furniture) return null
 
   if (furniture.modelStrategy.resolved === 'PARAMETRIC' && furniture.semantic.archetype === 'DESK') {
-    return <ParametricDesk dimensionsM={furniture.physical.dimensionsM} warning={warning} styleMode={styleMode} />
+    return <ParametricDesk dimensionsM={furniture.physical.dimensionsM} warning={warning} styleMode={styleMode} colorVariantId={furniture.appearance?.colorVariantId} />
   }
 
   if (furniture.modelStrategy.resolved === 'LIBRARY' || furniture.modelStrategy.resolved === 'GENERATED') {

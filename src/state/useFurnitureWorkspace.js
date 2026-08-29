@@ -238,6 +238,21 @@ export function reduceFurnitureWorkspace(state, command, roomDocument = null) {
         },
       }
     }
+    case FURNITURE_COMMAND_TYPES.UPDATE_FURNITURE_COLOR_VARIANT: {
+      if (state.selectedFurnitureId !== command.furnitureId) return state
+      const furniture = state.furnitureById[command.furnitureId]
+      if (!furniture) return state
+      return {
+        ...state,
+        furnitureById: {
+          ...state.furnitureById,
+          [furniture.id]: {
+            ...furniture,
+            appearance: { ...furniture.appearance, colorVariantId: command.colorVariantId ?? null },
+          },
+        },
+      }
+    }
     case FURNITURE_COMMAND_TYPES.TOGGLE_GEOMETRY_PROXY:
       return { ...state, showGeometryProxy: command.show }
     default:

@@ -11,7 +11,7 @@ function mappedColor(color, palette) {
 }
 
 /** Visual-only pass; preserves single material vs material-array shape. */
-export function applyCozyMaterial(root, { palette = COZY_V0_PALETTE, preserveExistingColors = true } = {}) {
+export function applyCozyMaterial(root, { palette = COZY_V0_PALETTE, preserveExistingColors = true, tintColor = null } = {}) {
   root.traverse((object) => {
     if (!object.isMesh) return
     const source = object.material; const sources = Array.isArray(source) ? source : [source]
@@ -19,7 +19,13 @@ export function applyCozyMaterial(root, { palette = COZY_V0_PALETTE, preserveExi
       const material = item?.clone?.() || new THREE.MeshStandardMaterial()
       material.metalness = Math.min(Number(material.metalness) || 0, 0.05)
       material.roughness = Math.max(Number(material.roughness) || 0.82, 0.82)
-      if (material.color) material.color.lerp(new THREE.Color(mappedColor(material.color, palette)), preserveExistingColors ? 0.35 : 1)
+      const hasTexture = Boolean(material.map || material.alphaMap || material.normalMap || material.roughnessMap || material.metalnessMap)
+      if (material.color && !hasTexture) {
+        const targetColor = tintColor && !/silver|metal|hitam|black/i.test(material.name || '')
+          ? tintColor
+          : mappedColor(material.color, palette)
+        material.color.lerp(new THREE.Color(targetColor), tintColor ? 0.72 : (preserveExistingColors ? 0.35 : 1))
+      }
       material.envMapIntensity = 0.15; material.needsUpdate = true; return material
     })
     object.material = Array.isArray(source) ? next : next[0]; object.castShadow = true; object.receiveShadow = true

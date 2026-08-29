@@ -103,6 +103,7 @@ export function createFurniture(input = {}) {
     },
     appearance: {
       dominantColor: nullableString(input.appearance?.dominantColor),
+      colorVariantId: nullableString(input.appearance?.colorVariantId),
     },
     modelStrategy: {
       ...defaultModelStrategy,

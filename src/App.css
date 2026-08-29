@@ -77,6 +77,12 @@ button.active { border-color: #c97800; color: #7a4700; background: #fff4d6; }
 .geometry-proxy-readout { margin: 8px 0 0; padding: 8px 10px; border: 1px solid #c5e1e8; border-radius: 7px; color: #356a78; background: #eef9fb; font-size: 11px; line-height: 1.5; }
 .furniture-list { display: grid; grid-template-columns: 1fr; gap: 7px; margin-top: 10px; }
 .furniture-list button { width: 100%; text-align: left; }
+.color-variant-control { margin: 14px 0 8px; }
+.color-variant-label { display: block; margin-bottom: 8px; color: #526168; font-size: 13px; }
+.color-variant-list { display: flex; flex-wrap: wrap; gap: 9px; }
+.color-swatch { width: 30px; height: 30px; padding: 0; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1px #d8dee1, 0 2px 5px rgba(42,55,62,.12); }
+.color-swatch:hover { border-color: #fff; box-shadow: 0 0 0 2px #d98200; }
+.color-swatch.selected { box-shadow: 0 0 0 2px #d98200, 0 2px 5px rgba(42,55,62,.12); }
 
 .furniture-page { width: min(1180px, calc(100% - 64px)); height: 100%; margin: 0 auto; padding: 44px 0 80px; overflow-y: auto; color: #273238; }
 .furniture-page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 36px; }

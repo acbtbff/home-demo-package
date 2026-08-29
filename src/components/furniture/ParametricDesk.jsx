@@ -1,15 +1,17 @@
 import { RoundedBox } from '@react-three/drei'
 import { COZY_V0_PALETTE, STYLE_BIBLE_V0 } from '../../domain/styleBible.js'
 import { createParametricDeskSpec } from '../../domain/parametricDesk.js'
+import { resolveFurnitureColorVariant } from '../../styles/cozy/colorVariants.js'
 
 const MATERIALS = {
   cozy: { wood: COZY_V0_PALETTE.DARK_WOOD, shadowWood: COZY_V0_PALETTE.SOFT_BLACK },
   original: { wood: '#6b4f36', shadowWood: '#332b25' },
 }
 
-function DeskPart({ part, warning, styleMode }) {
+function DeskPart({ part, warning, styleMode, colorVariantId }) {
   const palette = styleMode === 'COZY_V0' ? MATERIALS.cozy : MATERIALS.original
-  const color = warning ? '#ef4444' : palette[part.material] ?? palette.wood
+  const variant = resolveFurnitureColorVariant('DESK', colorVariantId)
+  const color = warning ? '#ef4444' : variant?.color ?? palette[part.material] ?? palette.wood
 
   return (
     <RoundedBox
@@ -29,12 +31,12 @@ function DeskPart({ part, warning, styleMode }) {
   )
 }
 
-export default function ParametricDesk({ dimensionsM, warning = false, styleMode = 'ORIGINAL' }) {
+export default function ParametricDesk({ dimensionsM, warning = false, styleMode = 'ORIGINAL', colorVariantId = null }) {
   const spec = createParametricDeskSpec(dimensionsM)
 
   return (
     <group name="visual-model:parametric-desk" userData={{ visualModel: true, strategy: 'PARAMETRIC', archetype: 'DESK' }}>
-      {spec.parts.map((part) => <DeskPart key={part.id} part={part} warning={warning} styleMode={styleMode} />)}
+      {spec.parts.map((part) => <DeskPart key={part.id} part={part} warning={warning} styleMode={styleMode} colorVariantId={colorVariantId} />)}
     </group>
   )
 }

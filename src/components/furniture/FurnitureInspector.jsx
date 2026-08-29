@@ -5,7 +5,9 @@ import {
   createRotateFurnitureYCommand,
   createAddFurnitureCommand,
   createRemoveFurnitureCommand,
+  createUpdateFurnitureColorVariantCommand,
 } from '../../domain/interactionCommands.js'
+import { getFurnitureColorVariants, resolveFurnitureColorVariant } from '../../styles/cozy/colorVariants.js'
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 const metersToCm = (value) => Math.round((value ?? 0) * 100)
@@ -74,6 +76,10 @@ export default function FurnitureInspector({
     if (!furniture || !placement || !dispatchFurnitureCommand) return
     dispatchFurnitureCommand(createRotateFurnitureYCommand({ furnitureId: furniture.id, deltaRadians: rotationY - placement.rotationY }))
   }
+  const updateColorVariant = (colorVariantId) => {
+    if (!furniture || !dispatchFurnitureCommand) return
+    dispatchFurnitureCommand(createUpdateFurnitureColorVariantCommand({ furnitureId: furniture.id, colorVariantId }))
+  }
 
   if (!selected || !furniture || !placement) {
     return (
@@ -113,6 +119,28 @@ export default function FurnitureInspector({
       <CmField label="深度" valueM={furniture.physical.dimensionsM.depth} minCm={35} maxCm={120} onChange={(depth) => updateDimensions({ depth })} />
       <CmField label="高度" valueM={furniture.physical.dimensionsM.height} minCm={45} maxCm={120} onChange={(height) => updateDimensions({ height })} />
       <DegreeField label="旋转" value={placement.rotationY} onChange={updateRotation} />
+      {getFurnitureColorVariants(furniture).length > 0 && (
+        <div className="color-variant-control">
+          <span className="color-variant-label">颜色</span>
+          <div className="color-variant-list" role="radiogroup" aria-label="家具颜色">
+            {getFurnitureColorVariants(furniture).map((variant) => {
+              const selectedVariant = resolveFurnitureColorVariant(furniture, furniture.appearance?.colorVariantId)
+              const selectedVariantId = selectedVariant?.id
+              return <button
+                key={variant.id}
+                type="button"
+                className={selectedVariantId === variant.id ? 'color-swatch selected' : 'color-swatch'}
+                style={{ backgroundColor: variant.color }}
+                title={variant.label}
+                aria-label={variant.label}
+                aria-pressed={selectedVariantId === variant.id}
+                onClick={() => updateColorVariant(variant.id)}
+              />
+            })}
+          </div>
+          <small className="hint">{resolveFurnitureColorVariant(furniture, furniture.appearance?.colorVariantId)?.label ?? '默认颜色'} · Cozy 预设</small>
+        </div>
+      )}
       <label className="debug-toggle">
         <input type="checkbox" checked={showGeometryProxy} onChange={(event) => dispatchFurnitureCommand(createToggleGeometryProxyCommand(event.target.checked))} />
         <span>Show GeometryProxy</span>

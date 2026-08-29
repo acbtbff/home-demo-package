@@ -3,11 +3,15 @@ import { useMemo } from 'react'
 import { Box3, Color, Vector3 } from 'three'
 import { calculateLibraryVisualCalibration } from '../../domain/furnitureAssets.js'
 import { applyCozyMaterial } from '../../styles/cozy/cozyMaterial.js'
+import { resolveFurnitureColorVariant } from '../../styles/cozy/colorVariants.js'
 
 const WARNING_COLOR = new Color('#ef4444')
 
 export default function LibraryGlbModel({ furniture, asset, warning = false, styleMode = 'ORIGINAL' }) {
   const { scene } = useGLTF(asset.modelUrl)
+  const colorVariantId = furniture.appearance?.colorVariantId ?? null
+  const dimensionsM = furniture.physical.dimensionsM
+  const archetype = furniture.semantic?.archetype
   const { model, offset, scale, aspectRatioWarning } = useMemo(() => {
     const cloned = scene.clone(true)
     const normalization = asset.normalization
@@ -22,7 +26,7 @@ export default function LibraryGlbModel({ furniture, asset, warning = false, sty
     const bounds = new Box3().setFromObject(cloned)
     const size = bounds.getSize(new Vector3())
     const center = bounds.getCenter(new Vector3())
-    const dimensions = furniture.physical.dimensionsM
+    const dimensions = dimensionsM
     const calibration = calculateLibraryVisualCalibration({
       assetDimensionsM: { width: size.x, depth: size.z, height: size.y },
       targetDimensionsM: dimensions,
@@ -40,7 +44,10 @@ export default function LibraryGlbModel({ furniture, asset, warning = false, sty
       })
       object.material = Array.isArray(object.material) ? clonedMaterials : clonedMaterials[0]
     })
-    if (styleMode === 'COZY_V0') applyCozyMaterial(cloned)
+    if (styleMode === 'COZY_V0') {
+      const variant = resolveFurnitureColorVariant(archetype, colorVariantId)
+      applyCozyMaterial(cloned, { tintColor: variant?.color ?? null })
+    }
 
     return {
       model: cloned,
@@ -48,7 +55,7 @@ export default function LibraryGlbModel({ furniture, asset, warning = false, sty
       scale: calibration.scale ?? [1, 1, 1],
       aspectRatioWarning: calibration.severeAspectMismatch,
     }
-  }, [asset.normalization, furniture.physical.dimensionsM, scene, warning, styleMode])
+  }, [archetype, asset.normalization, colorVariantId, dimensionsM, scene, warning, styleMode])
 
   return (
     <group

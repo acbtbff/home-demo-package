@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "source": { "type": "multi-photo-vision", "provider": "mock-photo-vision", "imageCount": 4, "confidence": 0.72 },
+  "scaleAnchor": { "type": "roomWidth", "valueMeters": 3.6 },
+  "roomShape": { "type": "rectangle", "confidence": 0.86 },
+  "walls": [
+    { "id": "draft-wall-01", "start": { "x": 0, "z": 0 }, "end": { "x": 3.6, "z": 0 }, "confidence": 0.86, "estimated": true },
+    { "id": "draft-wall-02", "start": { "x": 3.6, "z": 0 }, "end": { "x": 3.6, "z": 4.8 }, "confidence": 0.83, "estimated": true },
+    { "id": "draft-wall-03", "start": { "x": 3.6, "z": 4.8 }, "end": { "x": 0, "z": 4.8 }, "confidence": 0.8, "estimated": true },
+    { "id": "draft-wall-04", "start": { "x": 0, "z": 4.8 }, "end": { "x": 0, "z": 0 }, "confidence": 0.84, "estimated": true }
+  ],
+  "doors": [
+    { "id": "draft-door-01", "wallId": "draft-wall-02", "center": { "x": 3.6, "z": 1.1 }, "relativeWidth": 0.25, "width": 0.9, "height": 2.1, "confidence": 0.78, "estimated": true }
+  ],
+  "windows": [
+    { "id": "draft-window-01", "wallId": "draft-wall-04", "center": { "x": 0, "z": 2.4 }, "relativeWidth": 0.55, "width": 2, "height": 1.3, "sillHeight": 0.85, "confidence": 0.74, "estimated": true }
+  ],
+  "uncertainties": [
+    { "type": "hidden-wall", "message": "遮挡区域的墙面由相邻照片保守推断。" },
+    { "type": "scale-anchor", "message": "房间绝对尺度由用户提供的宽度锚点确定。" }
+  ]
+}

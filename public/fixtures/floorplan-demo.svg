@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#f8f6f0"/>
+  <g fill="none" stroke="#283238" stroke-linecap="square">
+    <path d="M120 100H1080V700H120Z" stroke-width="24"/>
+    <path d="M650 100V700M650 380H1080" stroke-width="20"/>
+  </g>
+  <g fill="none" stroke="#f8f6f0" stroke-width="30">
+    <path d="M1080 515V605M650 204V286M245 100H455M120 345V515"/>
+  </g>
+  <g fill="none" stroke="#2d7aa0" stroke-width="8">
+    <path d="M245 100H455M120 345V515"/>
+  </g>
+  <g fill="none" stroke="#b96d17" stroke-width="7">
+    <path d="M1080 605H990A90 90 0 0 1 1080 515M650 286H568A82 82 0 0 1 650 204"/>
+  </g>
+  <g fill="#68747a" font-family="system-ui, sans-serif" font-size="26" text-anchor="middle">
+    <text x="385" y="390">起居室</text><text x="865" y="255">卧室</text><text x="865" y="555">卫浴 / 玄关</text>
+  </g>
+  <g fill="#9a5c13" font-family="system-ui, sans-serif" font-size="22" text-anchor="middle">
+    <text x="600" y="760">整体宽度 9.6 m</text>
+    <text x="62" y="410" transform="rotate(-90 62 410)">整体进深 6.0 m</text>
+  </g>
+</svg>

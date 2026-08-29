@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "type": "floorplan-image",
+    "provider": "fixture:demo-floorplan-v1",
+    "confidence": 0.98,
+    "fixtureId": "demo-floorplan-v1"
+  },
+  "image": { "widthPixels": 1200, "heightPixels": 800 },
+  "bounds": { "minX": 120, "minY": 100, "maxX": 1080, "maxY": 700 },
+  "scale": { "pixelsPerMeter": null, "confidence": null },
+  "walls": [
+    { "id": "wall-north", "kind": "exterior", "start": { "x": 120, "y": 100 }, "end": { "x": 1080, "y": 100 }, "thicknessPixels": 12, "confidence": 0.99 },
+    { "id": "wall-east", "kind": "exterior", "start": { "x": 1080, "y": 100 }, "end": { "x": 1080, "y": 700 }, "thicknessPixels": 12, "confidence": 0.99 },
+    { "id": "wall-south", "kind": "exterior", "start": { "x": 1080, "y": 700 }, "end": { "x": 120, "y": 700 }, "thicknessPixels": 12, "confidence": 0.99 },
+    { "id": "wall-west", "kind": "exterior", "start": { "x": 120, "y": 700 }, "end": { "x": 120, "y": 100 }, "thicknessPixels": 12, "confidence": 0.99 },
+    { "id": "wall-partition-main", "kind": "partition", "start": { "x": 650, "y": 100 }, "end": { "x": 650, "y": 700 }, "thicknessPixels": 10, "confidence": 0.97 },
+    { "id": "wall-partition-right", "kind": "partition", "start": { "x": 650, "y": 380 }, "end": { "x": 1080, "y": 380 }, "thicknessPixels": 10, "confidence": 0.96 }
+  ],
+  "doors": [
+    { "id": "door-entry", "wallId": "wall-east", "center": { "x": 1080, "y": 560 }, "widthPixels": 90, "heightMeters": 2.1, "confidence": 0.98 },
+    { "id": "door-interior", "wallId": "wall-partition-main", "center": { "x": 650, "y": 245 }, "widthPixels": 82, "heightMeters": 2.1, "confidence": 0.96 }
+  ],
+  "windows": [
+    { "id": "window-north", "wallId": "wall-north", "center": { "x": 350, "y": 100 }, "widthPixels": 210, "heightMeters": 1.35, "sillHeightMeters": 0.85, "confidence": 0.98 },
+    { "id": "window-west", "wallId": "wall-west", "center": { "x": 120, "y": 430 }, "widthPixels": 170, "heightMeters": 1.35, "sillHeightMeters": 0.85, "confidence": 0.97 }
+  ]
+}

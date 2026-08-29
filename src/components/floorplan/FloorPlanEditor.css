@@ -1,0 +1,52 @@
+.floorplan-shell { display: grid; grid-template-rows: auto 1fr auto; width: 100%; height: 100%; color: #273238; background: #eef2f3; }
+.floorplan-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 18px; border-bottom: 1px solid #d8dee1; background: #fff; box-shadow: 0 4px 18px rgba(42,55,62,.06); z-index: 2; }
+.floorplan-toolbar > div:first-child { display: flex; flex-direction: column; gap: 2px; }
+.floorplan-toolbar strong { font-size: 17px; }
+.floorplan-toolbar span { color: #7b878d; font-size: 12px; }
+.floorplan-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.floorplan-actions .primary { border-color: #c97800; color: #fff; background: #d98200; }
+.floorplan-actions .primary:disabled { border-color: #d8dee1; color: #98a3a8; background: #edf1f2; cursor: not-allowed; }
+.floorplan-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 300px; min-height: 0; padding: 14px; gap: 14px; }
+.floorplan-canvas { width: 100%; height: 100%; min-height: 420px; overflow: hidden; border: 1px solid #d3dade; border-radius: 12px; background: #fbfcfc; box-shadow: 0 8px 28px rgba(42,55,62,.08); touch-action: none; }
+.floorplan-canvas.drawing { cursor: crosshair; }
+.floorplan-wall { cursor: grab; }
+.floorplan-wall:active { cursor: grabbing; }
+.wall-hit-target, .opening-hit-target { pointer-events: stroke; }
+.wall-handle { fill: #fff; stroke: #e08a08; stroke-width: 4; cursor: grab; filter: drop-shadow(0 2px 3px rgba(39,50,56,.25)); }
+.wall-handle:active { cursor: grabbing; fill: #fff2cf; }
+.dimension-label line { stroke: #d98200; stroke-width: 1.5; stroke-dasharray: 4 3; }
+.dimension-label rect { fill: #fff8e6; stroke: #e6a23c; }
+.dimension-label text { fill: #794900; text-anchor: middle; font: 12px system-ui, sans-serif; }
+.floorplan-opening { color: #1775a7; cursor: grab; }
+.floorplan-opening.selected { color: #e07d00; }
+.floorplan-opening > line:not(.opening-gap):not(.opening-hit-target), .floorplan-opening path { stroke: currentColor; stroke-width: 4; }
+.opening-gap { stroke: #fbfcfc; stroke-width: 20; }
+.opening-hit-target { stroke: transparent; stroke-width: 26; }
+.draw-start { fill: #fff; stroke: #d98200; stroke-width: 4; }
+.open-wall-endpoint { fill: #fff1f1; stroke: #c94b4b; stroke-width: 4; pointer-events: none; filter: drop-shadow(0 2px 3px rgba(125,45,45,.2)); }
+.floorplan-panel { overflow-y: auto; padding: 17px; border: 1px solid #d8dee1; border-radius: 12px; background: #fff; box-shadow: 0 8px 28px rgba(42,55,62,.08); }
+.room-settings { margin: -2px 0 16px; padding-bottom: 14px; border-bottom: 1px solid #e1e6e8; }
+.room-settings h2 { margin-bottom: 5px; }
+.plan-section-hint { margin: 0 0 10px; color: #718087; font-size: 11px; line-height: 1.5; }
+.closure-status { display: flex; flex-direction: column; gap: 4px; margin: -2px 0 16px; padding: 11px 12px; border: 1px solid; border-radius: 8px; font-size: 12px; line-height: 1.45; }
+.closure-status strong { font-size: 13px; }
+.closure-status.closed { border-color: #b9dfc3; color: #2f7040; background: #f1fbf3; }
+.closure-status.open { border-color: #efc4c4; color: #9f3e3e; background: #fff5f5; }
+.photo-import-status { margin: -7px 0 14px; padding: 8px 10px; border-radius: 7px; color: #356a78; background: #eef9fb; font-size: 11px; }
+.floorplan-import-status { margin: -7px 0 14px; padding: 8px 10px; border-radius: 7px; color: #356a4f; background: #effaf3; font-size: 11px; line-height: 1.45; }
+.floorplan-panel h2 { margin: 0 0 4px; font-size: 16px; }
+.plan-selection-id { margin: 0 0 15px; color: #829097; font-size: 11px; }
+.plan-field { display: grid; grid-template-columns: 1fr 122px; align-items: center; gap: 10px; margin: 9px 0; font-size: 13px; }
+.plan-input-unit { display: grid; grid-template-columns: 1fr 24px; align-items: center; overflow: hidden; border: 1px solid #d8dee1; border-radius: 7px; }
+.plan-input-unit:focus-within { border-color: #e58b08; box-shadow: 0 0 0 2px rgba(245,158,11,.14); }
+.plan-input-unit input { width: 100%; box-sizing: border-box; padding: 8px; border: 0; outline: 0; color: #273238; background: transparent; }
+.plan-input-unit input[readonly] { color: #6f7d84; background: #f3f6f7; }
+.plan-input-unit small { color: #879198; font-size: 11px; }
+.plan-button-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0 8px; }
+.floorplan-panel .danger { width: 100%; margin-top: 8px; border-color: #e7c9c9; color: #9c3636; background: #fff8f8; }
+.plan-empty-state { margin-top: 40px; text-align: center; color: #718087; }
+.plan-empty-state p { font-size: 12px; line-height: 1.6; }
+.draw-instruction { display: flex; flex-direction: column; gap: 4px; margin-top: 18px; padding: 12px; border-radius: 8px; color: #754700; background: #fff3d1; font-size: 12px; }
+.floorplan-status { display: flex; justify-content: space-between; padding: 8px 18px; border-top: 1px solid #d8dee1; color: #738087; background: #fff; font-size: 11px; }
+.floorplan-status .has-errors { color: #b05b00; }
+@media (max-width: 780px) { .floorplan-toolbar { align-items: flex-start; flex-direction: column; } .floorplan-workspace { grid-template-columns: 1fr; overflow-y: auto; } .floorplan-canvas { height: 55vh; } .floorplan-panel { min-height: 250px; } }

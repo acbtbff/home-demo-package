@@ -2,13 +2,26 @@ import { useNavigate } from 'react-router-dom'
 import { FURNITURE_CATALOG_V0 } from '../data/furnitureCatalog.js'
 import {
   createAddFurnitureCommand,
+  createCreatePlacementCommand,
   createRemoveFurnitureCommand,
   createSelectFurnitureCommand,
+  createUpdateFurnitureInfoCommand,
+  createPurchaseFurnitureCommand,
 } from '../domain/interactionCommands.js'
 import { MODEL_STRATEGIES, routeFurnitureModelStrategy } from '../domain/furnitureRouter.js'
 import { useSharedFurnitureWorkspace } from '../state/useSharedFurnitureWorkspace.js'
 import FurnitureIntakePanel from '../components/furniture/FurnitureIntakePanel.jsx'
 import { useState } from 'react'
+
+function FurnitureInfoEditor({ furniture, onSave, onClose }) {
+  const [name, setName] = useState(furniture.name ?? '')
+  const [dims, setDims] = useState(Object.fromEntries(Object.entries(furniture.physical.dimensionsM).map(([key, value]) => [key, Math.round(value * 100)])))
+  const [ownership, setOwnership] = useState(furniture.ownership.type === 'NONE' ? 'WISHLIST' : furniture.ownership.type)
+  const [price, setPrice] = useState(furniture.product?.price ?? '')
+  const [url, setUrl] = useState(furniture.product?.url ?? '')
+  const save = () => onSave({ name, dimensionsM: { width: Number(dims.width) / 100, depth: Number(dims.depth) / 100, height: Number(dims.height) / 100 }, ownershipType: ownership === 'WISHLIST' ? 'NONE' : ownership, lifecycleStatus: ownership === 'WISHLIST' ? 'WISHLIST' : 'OWNED', product: { price, url, name: furniture.product?.name ?? null, imagePreview: furniture.product?.imagePreview ?? null } })
+  return <div className="intake-backdrop"><section className="intake-panel info-editor" role="dialog" aria-modal="true"><header className="intake-header"><h2>编辑家具信息</h2><button type="button" onClick={onClose}>×</button></header><div className="intake-body"><label className="intake-field">家具名称<input value={name} onChange={(e) => setName(e.target.value)} /></label><p className="intake-note">类型：{furniture.semantic.archetype}（只读）</p><div className="intake-dimensions">{['width', 'depth', 'height'].map((key) => <label className="intake-field" key={key}>{key === 'width' ? '宽度' : key === 'depth' ? '深度' : '高度'} cm<input type="number" min="0.1" value={dims[key]} onChange={(e) => setDims((d) => ({ ...d, [key]: e.target.value }))} /></label>)}</div><fieldset className="intake-ownership"><legend>状态</legend><label><input type="radio" checked={ownership === 'USER'} onChange={() => setOwnership('USER')} />我的家具</label><label><input type="radio" checked={ownership === 'LANDLORD'} onChange={() => setOwnership('LANDLORD')} />房东家具</label><label><input type="radio" checked={ownership === 'WISHLIST'} onChange={() => setOwnership('WISHLIST')} />想购买</label></fieldset>{(furniture.product || ownership === 'WISHLIST') && <><label className="intake-field">价格<input type="number" min="0" value={price} onChange={(e) => setPrice(e.target.value)} /></label><label className="intake-field">商品链接<input value={url} onChange={(e) => setUrl(e.target.value)} /></label></>}<button className="intake-primary" type="button" onClick={save}>保存修改</button></div></section></div>
+}
 
 const STRATEGY_LABELS = {
   [MODEL_STRATEGIES.PARAMETRIC]: 'PARAMETRIC · 参数化',
@@ -20,6 +33,7 @@ export default function FurniturePage() {
   const navigate = useNavigate()
   const workspace = useSharedFurnitureWorkspace()
   const [showIntake, setShowIntake] = useState(false)
+  const [editingFurniture, setEditingFurniture] = useState(null)
 
   const addFurniture = (item) => {
     workspace.dispatchInteractionCommand(createAddFurnitureCommand(item))
@@ -82,6 +96,7 @@ export default function FurniturePage() {
           {workspace.furnitureItems.map((furniture) => {
             const placement = Object.values(workspace.effectivePlacementsById).find((item) => item.furnitureId === furniture.id)
             const facts = workspace.spatialAnalysis.byFurnitureId[furniture.id]
+            const pending = furniture.representation?.status === 'PENDING_GENERATION'
             return (
               <article key={furniture.id} className="furniture-owned-row">
                 <div>
@@ -95,7 +110,9 @@ export default function FurniturePage() {
                   <span>{placement ? `x ${placement.position.x.toFixed(2)} / z ${placement.position.z.toFixed(2)}` : '未放置'}</span>
                 </div>
                 <div className="furniture-owned-actions">
-                  <button type="button" onClick={() => editInRoom(furniture.id)}>在 3D 中编辑</button>
+                  <button type="button" onClick={() => setEditingFurniture(furniture)}>编辑信息</button>
+                  {pending ? <button type="button" disabled>等待生成模型</button> : placement ? <button type="button" onClick={() => editInRoom(furniture.id)}>在 3D 中编辑</button> : <button type="button" onClick={() => workspace.dispatchInteractionCommand(createCreatePlacementCommand(furniture.id))}>放入小屋</button>}
+                  {furniture.ownership.type === 'NONE' && furniture.lifecycle.status === 'WISHLIST' && <button type="button" onClick={() => workspace.dispatchInteractionCommand(createPurchaseFurnitureCommand(furniture.id))}>已购买</button>}
                   <button type="button" onClick={() => workspace.dispatchInteractionCommand(createRemoveFurnitureCommand(furniture.id))}>移除</button>
                 </div>
               </article>
@@ -105,6 +122,7 @@ export default function FurniturePage() {
         </div>
       </section>
       {showIntake && <FurnitureIntakePanel workspace={workspace} onClose={() => setShowIntake(false)} />}
+      {editingFurniture && <FurnitureInfoEditor furniture={editingFurniture} onClose={() => setEditingFurniture(null)} onSave={(patch) => { workspace.dispatchInteractionCommand(createUpdateFurnitureInfoCommand({ furnitureId: editingFurniture.id, patch })); setEditingFurniture(null) }} />}
     </main>
   )
 }

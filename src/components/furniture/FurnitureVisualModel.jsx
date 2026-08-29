@@ -9,7 +9,7 @@ export default function FurnitureVisualModel({ furniture, warning = false, style
   const resolution = resolveFurnitureModel(furniture)
 
   if (resolution.visualModelAvailable && resolution.strategy === 'PARAMETRIC' && resolution.generatorKey === 'DESK') {
-    return <ParametricDesk dimensionsM={furniture.physical.dimensionsM} warning={warning} styleMode={styleMode} />
+    return <ParametricDesk dimensionsM={furniture.physical.dimensionsM} warning={warning} styleMode={styleMode} wishlist={furniture.lifecycle?.status === 'WISHLIST'} />
   }
 
   if (resolution.visualModelAvailable && resolution.strategy === 'LIBRARY') {
@@ -17,7 +17,7 @@ export default function FurnitureVisualModel({ furniture, warning = false, style
       ? OFFICE_CHAIR_COZY_GEOMETRY_ASSET_V0
       : resolution.asset
     if (asset?.modelUrl?.endsWith('.glb')) {
-      return <LibraryGlbModel furniture={furniture} asset={asset} warning={warning} styleMode={styleMode} />
+      return <LibraryGlbModel furniture={furniture} asset={asset} warning={warning} styleMode={styleMode} wishlist={furniture.lifecycle?.status === 'WISHLIST'} />
     }
   }
 

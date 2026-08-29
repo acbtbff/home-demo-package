@@ -23,7 +23,7 @@ export function dimensionsCmToMeters({ width, depth, height } = {}) {
   return { width: centimetersToMeters(width), depth: centimetersToMeters(depth), height: centimetersToMeters(height) }
 }
 
-export function createFurnitureFromIntake({ id, name, archetype, category, dimensionsCm, ownershipKey = 'USER', photo } = {}) {
+export function createFurnitureFromIntake({ id, name, archetype, category, dimensionsCm, ownershipKey = 'USER', photo, product } = {}) {
   const semantic = normalizeFurnitureSemantic({ archetype, category })
   const dimensionsM = dimensionsCmToMeters(dimensionsCm)
   if (!Object.values(dimensionsM).every((value) => Number.isFinite(value) && value > 0)) {
@@ -37,6 +37,7 @@ export function createFurnitureFromIntake({ id, name, archetype, category, dimen
     ownership: { type: ownership.ownershipType },
     lifecycle: { status: ownership.lifecycleStatus },
     modelStrategy: { preferred: strategy, resolved: strategy },
+    product,
     intakeMetadata: photo ? { fileName: photo.name ?? null, mimeType: photo.type ?? null, previewUrl: photo.previewUrl ?? null, recognitionSource: 'DEMO' } : null,
   })
 }

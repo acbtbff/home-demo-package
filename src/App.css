@@ -86,6 +86,8 @@ button.active { border-color: #c97800; color: #7a4700; background: #fff4d6; }
 .furniture-room-action:hover { color: #fff; background: #bd6f00; }
 .furniture-header-actions { display: flex; gap: 8px; }
 .furniture-thumb { width: 38px; height: 38px; object-fit: cover; border-radius: 7px; }
+.info-editor { max-width: 620px; }
+.intake-mode { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
 .intake-backdrop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: rgba(35,45,48,.38); }
 .intake-panel { width: min(560px, 100%); max-height: min(760px, 94vh); overflow-y: auto; border-radius: 18px; background: #fffdfa; box-shadow: 0 24px 70px rgba(35,45,48,.28); }
 .intake-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 22px 24px 14px; border-bottom: 1px solid #ece7df; }.intake-header h2 { margin: 6px 0 0; font-size: 28px; font-weight: 500; }.intake-header button { border: 0; background: transparent; font-size: 24px; }

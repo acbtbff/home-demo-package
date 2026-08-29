@@ -7,7 +7,7 @@ const MATERIALS = {
   original: { wood: '#6b4f36', shadowWood: '#332b25' },
 }
 
-function DeskPart({ part, warning, styleMode }) {
+function DeskPart({ part, warning, styleMode, wishlist }) {
   const palette = styleMode !== 'ORIGINAL' ? MATERIALS.cozy : MATERIALS.original
   const color = warning ? '#ef4444' : palette[part.material] ?? palette.wood
 
@@ -24,17 +24,20 @@ function DeskPart({ part, warning, styleMode }) {
         color={color}
         roughness={STYLE_BIBLE_V0.materialDefaults.roughness}
         metalness={STYLE_BIBLE_V0.materialDefaults.metalness}
+        transparent={wishlist}
+        opacity={wishlist ? 0.64 : 1}
+        depthWrite={!wishlist}
       />
     </RoundedBox>
   )
 }
 
-export default function ParametricDesk({ dimensionsM, warning = false, styleMode = 'ORIGINAL' }) {
+export default function ParametricDesk({ dimensionsM, warning = false, styleMode = 'ORIGINAL', wishlist = false }) {
   const spec = createParametricDeskSpec(dimensionsM)
 
   return (
     <group name="visual-model:parametric-desk" userData={{ visualModel: true, strategy: 'PARAMETRIC', archetype: 'DESK' }}>
-      {spec.parts.map((part) => <DeskPart key={part.id} part={part} warning={warning} styleMode={styleMode} />)}
+      {spec.parts.map((part) => <DeskPart key={part.id} part={part} warning={warning} styleMode={styleMode} wishlist={wishlist} />)}
     </group>
   )
 }

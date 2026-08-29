@@ -109,6 +109,10 @@ export function createFurniture(input = {}) {
       preferred: modelStrategy.preferred ?? defaultModelStrategy.preferred,
       resolved: modelStrategy.resolved ?? null,
     },
+    representation: {
+      status: (modelStrategy.resolved ?? defaultModelStrategy.preferred) === 'GENERATED' ? 'PENDING_GENERATION' : 'READY',
+    },
+    intakeMetadata: input.intakeMetadata ?? null,
   }
 
   return furniture

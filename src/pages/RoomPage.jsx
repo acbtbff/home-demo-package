@@ -12,6 +12,7 @@ import { FURNITURE_CATALOG_V0 } from '../data/furnitureCatalog.js'
 import { useSharedRoomDocument } from '../state/useSharedRoomDocument.js'
 import { useSharedFurnitureWorkspace } from '../state/useSharedFurnitureWorkspace.js'
 import CozyLighting from '../styles/cozy/CozyLighting.jsx'
+import FurnitureIntakePanel from '../components/furniture/FurnitureIntakePanel.jsx'
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
@@ -34,6 +35,7 @@ export default function RoomPage() {
   const [editWalls, setEditWalls] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
   const [styleMode, setStyleMode] = useState('ORIGINAL')
+  const [showIntake, setShowIntake] = useState(false)
   const nextStyleMode = () => setStyleMode((value) => value === 'ORIGINAL' ? 'COZY_V0' : value === 'COZY_V0' ? 'COZY_V0_GEOMETRY' : 'ORIGINAL')
   const bounds = useMemo(() => getExteriorWallsBounds(document.walls), [document.walls])
   const defaultFurniture = furnitureWorkspace.furnitureItems[0] ?? null
@@ -109,6 +111,7 @@ export default function RoomPage() {
         <button className="selected" type="button">空间分析</button>
         <button type="button" onClick={() => navigate('/floorplan')}>我的户型</button>
         <button type="button" onClick={() => navigate('/furniture')}>我的家具</button>
+        <button type="button" onClick={() => setShowIntake(true)}>＋ 添加家具</button>
         <button type="button">愿望清单</button>
         <div className="room-sidebar-divider" />
         <button type="button" disabled>撤销</button>
@@ -155,6 +158,7 @@ export default function RoomPage() {
         <button className="reset-button" onClick={() => navigate('/floorplan')}>返回编辑户型</button>
       </aside>
       <div className="legend"><span className="orange-dot" />家具左键拖动 · Shift/右键拖家具旋转 · 橙色手柄改房间 · 滚轮缩放</div>
+      {showIntake && <FurnitureIntakePanel workspace={furnitureWorkspace} onClose={() => setShowIntake(false)} />}
     </main>
   )
 }

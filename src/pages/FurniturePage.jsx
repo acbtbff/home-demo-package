@@ -7,6 +7,8 @@ import {
 } from '../domain/interactionCommands.js'
 import { MODEL_STRATEGIES, routeFurnitureModelStrategy } from '../domain/furnitureRouter.js'
 import { useSharedFurnitureWorkspace } from '../state/useSharedFurnitureWorkspace.js'
+import FurnitureIntakePanel from '../components/furniture/FurnitureIntakePanel.jsx'
+import { useState } from 'react'
 
 const STRATEGY_LABELS = {
   [MODEL_STRATEGIES.PARAMETRIC]: 'PARAMETRIC · 参数化',
@@ -17,6 +19,7 @@ const STRATEGY_LABELS = {
 export default function FurniturePage() {
   const navigate = useNavigate()
   const workspace = useSharedFurnitureWorkspace()
+  const [showIntake, setShowIntake] = useState(false)
 
   const addFurniture = (item) => {
     workspace.dispatchInteractionCommand(createAddFurnitureCommand(item))
@@ -36,7 +39,7 @@ export default function FurniturePage() {
           <h1>我的家具</h1>
           <p>家具来源不同，但最终都进入同一套 Furniture + Placement + GeometryProxy + VisualModel 运行时。</p>
         </div>
-        <button className="furniture-room-action" type="button" onClick={() => navigate('/room')}>进入 3D 小屋</button>
+        <div className="furniture-header-actions"><button className="furniture-room-action" type="button" onClick={() => setShowIntake(true)}>＋ 添加家具</button><button type="button" onClick={() => navigate('/room')}>进入 3D 小屋</button></div>
       </header>
 
       <section className="furniture-section">
@@ -83,10 +86,11 @@ export default function FurniturePage() {
               <article key={furniture.id} className="furniture-owned-row">
                 <div>
                   <strong>{furniture.name}</strong>
-                  <span>{furniture.semantic.archetype} · {STRATEGY_LABELS[furniture.modelStrategy.resolved] ?? '未解析'}</span>
+                  <span>{furniture.semantic.archetype} · {STRATEGY_LABELS[furniture.modelStrategy.resolved] ?? '未解析'} · {furniture.representation?.status ?? 'READY'}</span>
                 </div>
                 <div className="furniture-owned-meta">
-                  <span>{Math.round(furniture.physical.dimensionsM.width * 100)} × {Math.round(furniture.physical.dimensionsM.depth * 100)} × {Math.round(furniture.physical.dimensionsM.height * 100)} cm</span>
+                  {furniture.intakeMetadata?.previewUrl && <img className="furniture-thumb" src={furniture.intakeMetadata.previewUrl} alt="" />}<span>{Math.round(furniture.physical.dimensionsM.width * 100)} × {Math.round(furniture.physical.dimensionsM.depth * 100)} × {Math.round(furniture.physical.dimensionsM.height * 100)} cm</span>
+                  <span>{furniture.ownership?.type ?? '未指定'} · {furniture.lifecycle?.status ?? '未指定'}</span>
                   <span>{facts?.outOfBounds ? '越界' : facts?.collisionDetected ? '存在碰撞' : '空间状态正常'}</span>
                   <span>{placement ? `x ${placement.position.x.toFixed(2)} / z ${placement.position.z.toFixed(2)}` : '未放置'}</span>
                 </div>
@@ -100,6 +104,7 @@ export default function FurniturePage() {
           {workspace.furnitureItems.length === 0 && <p className="furniture-empty">当前没有家具。请从上方选择一个样板添加。</p>}
         </div>
       </section>
+      {showIntake && <FurnitureIntakePanel workspace={workspace} onClose={() => setShowIntake(false)} />}
     </main>
   )
 }

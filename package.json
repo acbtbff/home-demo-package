@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "vision:server": "node server/photoVisionServer.mjs",
+    "test:agent:live": "node scripts/testAgentLive.mjs",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",

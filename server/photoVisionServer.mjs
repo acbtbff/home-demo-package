@@ -2,6 +2,16 @@ import http from 'node:http'
 import { validatePhotoRoomDraft } from '../src/domain/photoRoomDraft.js'
 import { validateFloorplanImageDraft } from '../src/domain/floorplanImageDraft.js'
 import { FLOORPLAN_IMAGE_DRAFT_JSON_SCHEMA, FLOORPLAN_IMAGE_VISION_SYSTEM_PROMPT } from '../src/services/floorplanImagePrompt.js'
+import { validateAgentInput } from '../src/decision/agent/buildAgentInput.js'
+import { validateAgentOutput } from '../src/decision/agent/validateAgentOutput.js'
+import { CONFLICT_REASONER_SYSTEM_INSTRUCTION } from '../src/decision/agent/conflictReasonerPrompt.js'
+import { createOpenAINextDecisionProvider, OpenAIProviderError } from './openaiNextDecisionProvider.mjs'
+
+try {
+  process.loadEnvFile?.('.env')
+} catch (error) {
+  if (error?.code !== 'ENOENT') throw error
+}
 
 const port = Number(process.env.PHOTO_VISION_PORT || 8787)
 const model = process.env.OPENAI_VISION_MODEL || 'gpt-4.1-mini'
@@ -70,6 +80,59 @@ function jsonResponse(response, status, value) {
   response.end(JSON.stringify(value))
 }
 
+function decisionAgentErrorStatus(code) {
+  if (code === 'PROVIDER_CONFIG_ERROR') return 503
+  if (code === 'PROVIDER_AUTH_ERROR') return 502
+  if (code === 'PROVIDER_RATE_LIMIT') return 429
+  if (code === 'PROVIDER_TIMEOUT') return 504
+  if (code === 'PROVIDER_UNAVAILABLE') return 503
+  if (code === 'INVALID_AGENT_OUTPUT') return 502
+  return 502
+}
+
+function decisionAgentErrorResponse(response, error) {
+  const code = error?.code || 'UNKNOWN_PROVIDER_ERROR'
+  const status = decisionAgentErrorStatus(code)
+  jsonResponse(response, status, {
+    error: { code },
+    capabilities: { responsesApi: error instanceof OpenAIProviderError ? error.apiMode === 'responses' : null, structuredOutputs: error instanceof OpenAIProviderError ? error.structuredOutputs : null },
+  })
+}
+
+async function handleDecisionAgentReason(response, body) {
+  let payload
+  try {
+    payload = JSON.parse(body.toString('utf8'))
+  } catch {
+    jsonResponse(response, 400, { error: { code: 'INVALID_AGENT_INPUT' } })
+    return
+  }
+  const agentInput = payload?.agentInput
+  const inputValidation = validateAgentInput(agentInput)
+  if (!inputValidation.valid) {
+    jsonResponse(response, 400, { error: { code: 'INVALID_AGENT_INPUT', details: inputValidation.errors } })
+    return
+  }
+  if (agentInput.unresolvedContext.resolutionStatus !== 'NEEDS_AGENT' || agentInput.unresolvedContext.needsAgentReasoning !== true || agentInput.allowedDecisions.length < 2) {
+    jsonResponse(response, 409, { error: { code: 'AGENT_NOT_REQUIRED' } })
+    return
+  }
+
+  try {
+    const provider = createOpenAINextDecisionProvider()
+    const output = await provider.generateStructuredDecision({ systemInstruction: CONFLICT_REASONER_SYSTEM_INSTRUCTION, input: agentInput, outputSchema: 'furniture-agent-output-v0.3.1' })
+    const outputValidation = validateAgentOutput(output, agentInput)
+    if (!outputValidation.valid) {
+      const error = new OpenAIProviderError('INVALID_AGENT_OUTPUT', { status: 200, structuredOutputs: true })
+      jsonResponse(response, 502, { error: { code: error.code, details: outputValidation.errors }, capabilities: { responsesApi: true, structuredOutputs: true } })
+      return
+    }
+    jsonResponse(response, 200, output)
+  } catch (error) {
+    decisionAgentErrorResponse(response, error)
+  }
+}
+
 async function callVision({ files, scaleAnchor, prompt, responseSchema, schemaName = 'photo_room_draft', validate = validatePhotoRoomDraft }) {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
@@ -115,12 +178,17 @@ const server = http.createServer(async (request, response) => {
   }
   const isPhotoRoomRequest = request.method === 'POST' && request.url === '/api/analyze-room'
   const isFloorplanRequest = request.method === 'POST' && request.url === '/api/analyze-floorplan'
-  if (!isPhotoRoomRequest && !isFloorplanRequest) {
+  const isDecisionAgentRequest = request.method === 'POST' && request.url === '/api/decision/agent-reason'
+  if (!isPhotoRoomRequest && !isFloorplanRequest && !isDecisionAgentRequest) {
     jsonResponse(response, 404, { error: 'Not found' })
     return
   }
   try {
     const body = await readBody(request)
+    if (isDecisionAgentRequest) {
+      await handleDecisionAgentReason(response, body)
+      return
+    }
     const contentType = request.headers['content-type'] || ''
     const { fields, files } = contentType.includes('application/json') ? parseJsonImages(body) : parseMultipart(body, contentType)
     if (isPhotoRoomRequest && (files.length < 4 || files.length > 8)) throw new Error('Provide 4-8 room images')

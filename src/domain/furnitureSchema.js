@@ -25,6 +25,7 @@ export function createFurniture(input = {}) {
   return {
     id: nullableString(input.id),
     name: nullableString(input.name),
+    isFavorite: input.isFavorite === true,
     semantic,
     physical: {
       dimensionsM: normalizeDimensionsM(input.physical?.dimensionsM),
@@ -33,6 +34,9 @@ export function createFurniture(input = {}) {
       disassemblable: nullableBoolean(input.physical?.disassemblable),
       modular: nullableBoolean(input.physical?.modular),
       canServeAsMovingContainer: nullableBoolean(input.physical?.canServeAsMovingContainer),
+    },
+    ownership: {
+      type: input.ownership?.type ?? input.ownership ?? null,
     },
     lifecycle: {
       status: nullableString(input.lifecycle?.status),

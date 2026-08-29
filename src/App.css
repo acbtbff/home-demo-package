@@ -75,6 +75,24 @@ button.active { border-color: #c97800; color: #7a4700; background: #fff4d6; }
 .debug-toggle { display: flex; align-items: center; gap: 9px; margin: 12px 0 8px; color: #526168; font-size: 13px; }
 .debug-toggle input { width: 16px; height: 16px; accent-color: #d98200; }
 .geometry-proxy-readout { margin: 8px 0 0; padding: 8px 10px; border: 1px solid #c5e1e8; border-radius: 7px; color: #356a78; background: #eef9fb; font-size: 11px; line-height: 1.5; }
+.decision-card { margin-top: 18px; padding-top: 15px; border-top: 1px solid #e1e6e8; }
+.decision-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.decision-card-eyebrow { color: #bd7410; font-size: 9px; font-weight: 700; letter-spacing: .16em; }
+.decision-card h3 { margin: 4px 0 0; color: #273238; font-size: 15px; }
+.decision-source, .decision-confidence { display: inline-flex; padding: 4px 7px; border-radius: 999px; color: #6d5a3a; background: #fff4d6; font-size: 10px; white-space: nowrap; }
+.decision-card-hint, .decision-card-status, .decision-card-error, .decision-unresolved { color: #7b878d; font-size: 11px; line-height: 1.5; }
+.decision-card-error { color: #a45138; }
+.decision-main-label { margin: 12px 0 5px; color: #754700; font-size: 18px; font-weight: 600; }
+.decision-detail-block { margin-top: 12px; font-size: 11px; line-height: 1.5; }
+.decision-detail-block strong, .decision-next-action strong { display: block; margin-bottom: 4px; color: #526168; font-size: 11px; }
+.decision-detail-block ul { margin: 0; padding-left: 17px; color: #68767d; }
+.decision-detail-block li + li { margin-top: 4px; }
+.decision-tradeoffs { opacity: .8; }
+.decision-next-action { margin: 12px 0 0; padding: 9px 10px; border-radius: 8px; color: #526168; background: #f2f5f5; font-size: 11px; line-height: 1.5; }
+.decision-action { width: 100%; margin-top: 12px; color: #fff; border-color: #d98200; background: #d98200; }
+.decision-action:hover { color: #fff; background: #bd6f00; }
+.decision-action:disabled { cursor: wait; opacity: .65; }
+.decision-retry { width: 100%; margin-top: 12px; font-size: 11px; }
 .furniture-list { display: grid; grid-template-columns: 1fr; gap: 7px; margin-top: 10px; }
 .furniture-list button { width: 100%; text-align: left; }
 

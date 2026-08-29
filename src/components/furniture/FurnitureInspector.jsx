@@ -6,6 +6,7 @@ import {
   createAddFurnitureCommand,
   createRemoveFurnitureCommand,
 } from '../../domain/interactionCommands.js'
+import DecisionCard from './DecisionCard.jsx'
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 const metersToCm = (value) => Math.round((value ?? 0) * 100)
@@ -61,6 +62,9 @@ export default function FurnitureInspector({
   showGeometryProxy,
   dispatchFurnitureCommand,
   catalogItems = [],
+  roomDocument = null,
+  spatialAnalysis = null,
+  userProfile = {},
 }) {
   const toggleSelection = () => {
     if (!furniture || !dispatchFurnitureCommand) return
@@ -125,6 +129,7 @@ export default function FurnitureInspector({
           {spatialFacts.collisionDetected ? 'Collision: yes' : 'Collision: no'} · {spatialFacts.outOfBounds ? 'Out of bounds: yes' : 'Out of bounds: no'}
         </p>
       )}
+      <DecisionCard key={`${furniture.id}:${furniture.lifecycle?.status ?? 'UNKNOWN'}`} furniture={furniture} placement={placement} roomDocument={roomDocument} spatialAnalysis={spatialAnalysis} userProfile={userProfile} spatialFacts={spatialFacts} />
       <div className="furniture-list">
         {furnitureItems.map((item) => (
           <button

@@ -146,6 +146,8 @@ export default function RoomPage() {
           showGeometryProxy={furnitureWorkspace.showGeometryProxy}
           dispatchFurnitureCommand={furnitureWorkspace.dispatchInteractionCommand}
           catalogItems={FURNITURE_CATALOG_V0}
+          roomDocument={document}
+          spatialAnalysis={furnitureWorkspace.spatialAnalysis}
         />
         <button className="reset-button" onClick={() => navigate('/floorplan')}>返回编辑户型</button>
       </aside>

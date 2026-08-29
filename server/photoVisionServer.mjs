@@ -5,6 +5,7 @@ import { FLOORPLAN_IMAGE_DRAFT_JSON_SCHEMA, FLOORPLAN_IMAGE_VISION_SYSTEM_PROMPT
 import { validateAgentInput } from '../src/decision/agent/buildAgentInput.js'
 import { validateAgentOutput } from '../src/decision/agent/validateAgentOutput.js'
 import { CONFLICT_REASONER_SYSTEM_INSTRUCTION } from '../src/decision/agent/conflictReasonerPrompt.js'
+import { evaluateFurnitureDecision } from '../src/decision/orchestration/furnitureDecisionOrchestrator.js'
 import { createOpenAINextDecisionProvider, OpenAIProviderError } from './openaiNextDecisionProvider.mjs'
 
 try {
@@ -146,6 +147,35 @@ async function handleDecisionAgentReason(response, body) {
   }
 }
 
+async function handleDecisionEvaluate(response, body) {
+  let payload
+  try {
+    payload = JSON.parse(body.toString('utf8'))
+  } catch {
+    jsonResponse(response, 400, { error: { code: 'INVALID_DECISION_REQUEST' } })
+    return
+  }
+  if (!payload || typeof payload !== 'object' || !['PURCHASE', 'MOVE'].includes(payload.decisionType) || !payload.furniture || typeof payload.furniture !== 'object') {
+    jsonResponse(response, 400, { error: { code: 'INVALID_DECISION_REQUEST' } })
+    return
+  }
+  const result = await evaluateFurnitureDecision({
+    decisionType: payload.decisionType,
+    furniture: payload.furniture,
+    roomDocument: payload.roomDocument,
+    placement: payload.placement,
+    spatialAnalysis: payload.spatialAnalysis,
+    userSituation: payload.userSituation,
+    userContext: payload.userContext,
+    userProfile: payload.userProfile,
+    productFacts: payload.productFacts,
+    logisticsContext: payload.logisticsContext,
+    overrides: payload.overrides,
+    agentProvider: createOpenAINextDecisionProvider(),
+  })
+  jsonResponse(response, result.source === 'AGENT_ERROR' ? 502 : 200, result)
+}
+
 async function callVision({ files, scaleAnchor, prompt, responseSchema, schemaName = 'photo_room_draft', validate = validatePhotoRoomDraft }) {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
@@ -192,7 +222,8 @@ const server = http.createServer(async (request, response) => {
   const isPhotoRoomRequest = request.method === 'POST' && request.url === '/api/analyze-room'
   const isFloorplanRequest = request.method === 'POST' && request.url === '/api/analyze-floorplan'
   const isDecisionAgentRequest = request.method === 'POST' && request.url === '/api/decision/agent-reason'
-  if (!isPhotoRoomRequest && !isFloorplanRequest && !isDecisionAgentRequest) {
+  const isDecisionEvaluateRequest = request.method === 'POST' && request.url === '/api/decision/evaluate'
+  if (!isPhotoRoomRequest && !isFloorplanRequest && !isDecisionAgentRequest && !isDecisionEvaluateRequest) {
     jsonResponse(response, 404, { error: 'Not found' })
     return
   }
@@ -200,6 +231,10 @@ const server = http.createServer(async (request, response) => {
     const body = await readBody(request)
     if (isDecisionAgentRequest) {
       await handleDecisionAgentReason(response, body)
+      return
+    }
+    if (isDecisionEvaluateRequest) {
+      await handleDecisionEvaluate(response, body)
       return
     }
     const contentType = request.headers['content-type'] || ''

@@ -99,6 +99,19 @@ function decisionAgentErrorResponse(response, error) {
   })
 }
 
+function summarizeAgentOutput(output) {
+  if (!output || typeof output !== 'object' || Array.isArray(output)) return null
+  return {
+    topLevelKeys: Object.keys(output),
+    decision: output.decision,
+    confidence: output.confidence,
+    primaryReasonRuleIds: output.primaryReasonRuleIds,
+    tradeoffRuleIds: output.tradeoffRuleIds,
+    missingInformation: output.missingInformation,
+    nextAction: output.nextAction,
+  }
+}
+
 async function handleDecisionAgentReason(response, body) {
   let payload
   try {
@@ -123,8 +136,8 @@ async function handleDecisionAgentReason(response, body) {
     const output = await provider.generateStructuredDecision({ systemInstruction: CONFLICT_REASONER_SYSTEM_INSTRUCTION, input: agentInput, outputSchema: 'furniture-agent-output-v0.3.1' })
     const outputValidation = validateAgentOutput(output, agentInput)
     if (!outputValidation.valid) {
-      const error = new OpenAIProviderError('INVALID_AGENT_OUTPUT', { status: 200, structuredOutputs: true })
-      jsonResponse(response, 502, { error: { code: error.code, details: outputValidation.errors }, capabilities: { responsesApi: true, structuredOutputs: true } })
+      const error = new OpenAIProviderError('INVALID_AGENT_OUTPUT', { status: 200, structuredOutputs: false, apiMode: 'chat_completions' })
+      jsonResponse(response, 502, { error: { code: error.code, details: outputValidation.errors }, validationIssues: outputValidation.issues, diagnosticSummary: summarizeAgentOutput(output), capabilities: { responsesApi: false, structuredOutputs: false } })
       return
     }
     jsonResponse(response, 200, output)

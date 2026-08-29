@@ -31,13 +31,24 @@ const agentInput = {
   unresolvedContext: { resolutionStatus: 'NEEDS_AGENT', needsAgentReasoning: true, unresolvedReason: 'MATERIAL_DIRECTION_CONFLICT' },
 }
 
-function printFailure(httpStatus, code, structuredOutputs = null) {
+function printFailure(httpStatus, code, structuredOutputs = null, validationIssues = [], diagnosticSummary = null) {
   console.log(`endpoint=${providerEndpoint}`)
   console.log(`model=${model}`)
   console.log(`http_status=${httpStatus ?? 'UNAVAILABLE'}`)
   console.log(`error_code=${code}`)
   console.log(`api_mode=${apiMode}`)
   console.log(`structured_outputs=${structuredOutputs === true ? 'true' : structuredOutputs === false ? 'false' : 'unknown'}`)
+  if (diagnosticSummary) {
+    console.log(`parsed_top_level_keys=${JSON.stringify(diagnosticSummary.topLevelKeys ?? [])}`)
+    console.log(`parsed_decision=${JSON.stringify(diagnosticSummary.decision ?? null)}`)
+    console.log(`parsed_confidence=${JSON.stringify(diagnosticSummary.confidence ?? null)}`)
+    console.log(`parsed_primaryReasonRuleIds=${JSON.stringify(diagnosticSummary.primaryReasonRuleIds ?? null)}`)
+    console.log(`parsed_tradeoffRuleIds=${JSON.stringify(diagnosticSummary.tradeoffRuleIds ?? null)}`)
+  }
+  if (validationIssues.length) {
+    console.log(`validation_issue_codes=${JSON.stringify(validationIssues.map(({ code }) => code))}`)
+    console.log(`validation_issue_paths=${JSON.stringify(validationIssues.map(({ path }) => path))}`)
+  }
   console.log('request_count=1')
 }
 
@@ -81,7 +92,7 @@ if (!inputValidation.valid) {
     if (response) {
       const payload = await response.json().catch(() => ({}))
       if (!response.ok) {
-        printFailure(response.status, payload?.error?.code || 'UNKNOWN_PROVIDER_ERROR', payload?.capabilities?.structuredOutputs ?? null)
+        printFailure(response.status, payload?.error?.code || 'UNKNOWN_PROVIDER_ERROR', payload?.capabilities?.structuredOutputs ?? null, payload?.validationIssues ?? [], payload?.diagnosticSummary ?? null)
         process.exitCode = 1
       } else {
         const validation = validateAgentOutput(payload, agentInput)

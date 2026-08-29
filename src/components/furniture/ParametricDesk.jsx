@@ -8,7 +8,7 @@ const MATERIALS = {
 }
 
 function DeskPart({ part, warning, styleMode }) {
-  const palette = styleMode === 'COZY_V0' ? MATERIALS.cozy : MATERIALS.original
+  const palette = styleMode !== 'ORIGINAL' ? MATERIALS.cozy : MATERIALS.original
   const color = warning ? '#ef4444' : palette[part.material] ?? palette.wood
 
   return (

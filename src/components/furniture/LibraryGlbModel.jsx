@@ -40,7 +40,7 @@ export default function LibraryGlbModel({ furniture, asset, warning = false, sty
       })
       object.material = Array.isArray(object.material) ? clonedMaterials : clonedMaterials[0]
     })
-    if (styleMode === 'COZY_V0') applyCozyMaterial(cloned)
+    if (styleMode !== 'ORIGINAL') applyCozyMaterial(cloned)
 
     return {
       model: cloned,

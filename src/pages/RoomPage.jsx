@@ -34,6 +34,7 @@ export default function RoomPage() {
   const [editWalls, setEditWalls] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
   const [styleMode, setStyleMode] = useState('ORIGINAL')
+  const nextStyleMode = () => setStyleMode((value) => value === 'ORIGINAL' ? 'COZY_V0' : value === 'COZY_V0' ? 'COZY_V0_GEOMETRY' : 'ORIGINAL')
   const bounds = useMemo(() => getExteriorWallsBounds(document.walls), [document.walls])
   const defaultFurniture = furnitureWorkspace.furnitureItems[0] ?? null
   const defaultPlacement = defaultFurniture
@@ -65,8 +66,8 @@ export default function RoomPage() {
   return (
     <main className="app-shell room-page">
       <Canvas shadows camera={{ position: [8.8, 7.2, 8.8], fov: 42, near: 0.1, far: 100 }} dpr={[1, 2]}>
-        <color attach="background" args={[styleMode === 'COZY_V0' ? '#F2EFE8' : '#cfd9dd']} />
-        {styleMode === 'COZY_V0' ? <CozyLighting /> : <><ambientLight intensity={0.8} /><directionalLight castShadow position={[4, 9, 6]} intensity={1.5} shadow-mapSize-width={2048} shadow-mapSize-height={2048} /></>}
+        <color attach="background" args={[styleMode !== 'ORIGINAL' ? '#F2EFE8' : '#cfd9dd']} />
+        {styleMode !== 'ORIGINAL' ? <CozyLighting /> : <><ambientLight intensity={0.8} /><directionalLight castShadow position={[4, 9, 6]} intensity={1.5} shadow-mapSize-width={2048} shadow-mapSize-height={2048} /></>}
         <Room
           document={document}
           editWalls={editWalls}
@@ -97,7 +98,7 @@ export default function RoomPage() {
 
       <div className="room-topbar">
         <div><strong>3D 小屋</strong><span>Demo 户型 3.2 × 5.0 × 2.7 m · PARAMETRIC/LIBRARY 已接入 · GENERATED 接口预留</span></div>
-        <button className="active" type="button" onClick={() => setStyleMode((value) => value === 'COZY_V0' ? 'ORIGINAL' : 'COZY_V0')}>Style: {styleMode}</button>
+        <button className="active" type="button" onClick={nextStyleMode}>Style: {styleMode}</button>
         <button className={editWalls ? 'active' : ''} onClick={() => setEditWalls((value) => !value)}>{editWalls ? '墙体拖动：开' : '墙体拖动：关'}</button>
       </div>
 

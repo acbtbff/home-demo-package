@@ -110,6 +110,22 @@ export const OFFICE_CHAIR_LIBRARY_ASSET_V0 = createAssetContract({
   },
 })
 
+export const OFFICE_CHAIR_COZY_GEOMETRY_ASSET_V0 = createAssetContract({
+  id: 'office-chair-cozy-v0',
+  archetype: 'OFFICE_CHAIR',
+  modelUrl: '/assets/furniture/office-chair-cozy-v0.glb',
+  referenceDimensionsM: { width: null, depth: null, height: null },
+  styleFamily: 'COZY_V0',
+  source: ASSET_SOURCES.INTERNAL,
+  status: ASSET_STATUSES.READY,
+  normalization: {
+    rotationX: OFFICE_CHAIR_LIBRARY_ASSET_V0.normalization.rotationX,
+    rotationY: OFFICE_CHAIR_LIBRARY_ASSET_V0.normalization.rotationY,
+    rotationZ: OFFICE_CHAIR_LIBRARY_ASSET_V0.normalization.rotationZ,
+    rotationOrder: OFFICE_CHAIR_LIBRARY_ASSET_V0.normalization.rotationOrder,
+  },
+})
+
 export const TWO_SEAT_SOFA_LIBRARY_ASSET_V0 = createAssetContract({
   id: 'two-seat-sofa-local-v0',
   archetype: 'TWO_SEAT_SOFA',

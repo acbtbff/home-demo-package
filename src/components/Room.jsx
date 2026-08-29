@@ -59,7 +59,7 @@ function Room({ document, editWalls, onDimensionDrag, onDragStateChange, styleMo
         receiveShadow
       >
         <boxGeometry args={[bounds.width + floorThickness * 2, floorThickness, bounds.depth + floorThickness * 2]} />
-        <meshStandardMaterial color={styleMode === 'COZY_V0' ? COZY_V0_PALETTE.WARM_GRAY : '#d8c4a8'} roughness={0.92} metalness={0} />
+        <meshStandardMaterial color={styleMode !== 'ORIGINAL' ? COZY_V0_PALETTE.WARM_GRAY : '#d8c4a8'} roughness={0.92} metalness={0} />
       </mesh>
 
       {document.walls.map((wall) => (
@@ -67,7 +67,7 @@ function Room({ document, editWalls, onDimensionDrag, onDragStateChange, styleMo
           key={wall.id}
           wall={wall}
           openings={document.openings.filter((opening) => opening.wallId === wall.id)}
-          color={styleMode === 'COZY_V0' ? COZY_V0_PALETTE.WARM_WHITE : (materials.get(wall.materialId)?.color ?? '#eee9df')}
+          color={styleMode !== 'ORIGINAL' ? COZY_V0_PALETTE.WARM_WHITE : (materials.get(wall.materialId)?.color ?? '#eee9df')}
           roomCenter={{ x: bounds.centerX, z: bounds.centerZ }}
           styleMode={styleMode}
         />

@@ -101,7 +101,7 @@ function WallSegment({ wall, openings, color, roomCenter = { x: 0, z: 0 }, style
           position={[-length / 2 + opening.offset, opening.sillHeight + opening.height / 2, 0]}
         >
           <boxGeometry args={[opening.width, opening.height, wall.thickness * 0.35]} />
-          <meshPhysicalMaterial color={styleMode === 'COZY_V0' ? COZY_V0_PALETTE.DUSTY_BLUE : '#bde3f2'} transparent opacity={0.42} roughness={0.1} />
+          <meshPhysicalMaterial color={styleMode !== 'ORIGINAL' ? COZY_V0_PALETTE.DUSTY_BLUE : '#bde3f2'} transparent opacity={0.42} roughness={0.1} />
         </mesh>
       ))}
     </group>

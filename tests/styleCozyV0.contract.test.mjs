@@ -5,7 +5,8 @@ import { applyCozyMaterial } from '../src/styles/cozy/cozyMaterial.js'
 import { COZY_V0_PALETTE } from '../src/styles/cozy/cozyPalette.js'
 import { createFurniture } from '../src/domain/furnitureSchema.js'
 import { createGeometryProxyFromFurniture, createPlacement, WORLD_UNIT_METERS } from '../src/domain/spatialContracts.js'
-import { calculateLibraryVisualCalibration } from '../src/domain/furnitureAssets.js'
+import { calculateLibraryVisualCalibration, OFFICE_CHAIR_COZY_GEOMETRY_ASSET_V0, OFFICE_CHAIR_LIBRARY_ASSET_V0 } from '../src/domain/furnitureAssets.js'
+import { existsSync } from 'node:fs'
 
 test('Cozy material pass changes visual materials without changing physical or placement contracts', () => {
   const furniture = createFurniture({ id: 'style-test', semantic: { category: 'TABLE', archetype: 'DESK' }, physical: { dimensionsM: { width: 1.2, depth: 0.6, height: 0.75 } } })
@@ -40,4 +41,12 @@ test('Cozy material pass preserves material arrays and library calibration/world
   assert.equal(mesh.material.length, 2)
   assert.deepEqual(calculateLibraryVisualCalibration({ assetDimensionsM: { width: 1, depth: 1, height: 1 }, targetDimensionsM: { width: 1, depth: 1, height: 1 } }).scale, [1, 1, 1])
   assert.equal(WORLD_UNIT_METERS, 1)
+})
+
+test('Office Chair geometry pilot keeps original asset and uses a separate candidate asset', () => {
+  assert.equal(OFFICE_CHAIR_LIBRARY_ASSET_V0.modelUrl, '/assets/furniture/office-chair.glb')
+  assert.equal(OFFICE_CHAIR_COZY_GEOMETRY_ASSET_V0.modelUrl, '/assets/furniture/office-chair-cozy-v0.glb')
+  assert.equal(existsSync(new URL('../public/assets/furniture/office-chair.glb', import.meta.url)), true)
+  assert.equal(existsSync(new URL('../public/assets/furniture/office-chair-cozy-v0.glb', import.meta.url)), true)
+  assert.equal(OFFICE_CHAIR_LIBRARY_ASSET_V0.normalization.rotationOrder, OFFICE_CHAIR_COZY_GEOMETRY_ASSET_V0.normalization.rotationOrder)
 })

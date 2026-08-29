@@ -1,4 +1,5 @@
 import { createModelStrategy } from './furnitureRouter.js'
+import { CAPABILITY_STATUS, getFurnitureCapability } from './furnitureCapabilityRegistry.js'
 import { normalizeFurnitureSemantic } from './furnitureSemantic.js'
 import { WORLD_UNIT_METERS, WORLD_SCALE_METERS_PER_UNIT, WORLD_UNITS, WORLD_SCALE_CONTRACT, COORDINATE_CONTRACT } from './worldScale.js'
 
@@ -77,6 +78,13 @@ export function createFurniture(input = {}) {
   const semantic = normalizeFurnitureSemantic(input.semantic ?? input)
   const modelStrategy = input.modelStrategy ?? {}
   const defaultModelStrategy = createModelStrategy(semantic)
+  const capability = getFurnitureCapability(semantic)
+  const resolvedStrategy = modelStrategy.resolved ?? defaultModelStrategy.preferred
+  const representationStatus = resolvedStrategy === 'GENERATED'
+    ? 'PENDING_GENERATION'
+    : capability.capabilityStatus === CAPABILITY_STATUS.READY
+      ? 'READY'
+      : 'PENDING_REPRESENTATION'
 
   const furniture = {
     id: nullableString(input.id),
@@ -110,7 +118,9 @@ export function createFurniture(input = {}) {
       resolved: modelStrategy.resolved ?? null,
     },
     representation: {
-      status: (modelStrategy.resolved ?? defaultModelStrategy.preferred) === 'GENERATED' ? 'PENDING_GENERATION' : 'READY',
+      status: representationStatus,
+      capabilityStatus: capability.capabilityStatus,
+      fallback: capability.fallback,
     },
     intakeMetadata: input.intakeMetadata ?? null,
   }

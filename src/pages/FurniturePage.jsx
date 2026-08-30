@@ -10,7 +10,9 @@ import {
 } from '../domain/interactionCommands.js'
 import { useSharedFurnitureWorkspace } from '../state/useSharedFurnitureWorkspace.js'
 import FurnitureIntakePanel from '../components/furniture/FurnitureIntakePanel.jsx'
+import PurchaseDecisionPanel from '../components/furniture/PurchaseDecisionPanel.jsx'
 import { useState } from 'react'
+import { useSharedRoomDocument } from '../state/useSharedRoomDocument.js'
 import {
   formatFurnitureDimensions,
   getFurnitureName,
@@ -33,6 +35,7 @@ function FurnitureInfoEditor({ furniture, onSave, onClose }) {
 export default function FurniturePage() {
   const navigate = useNavigate()
   const workspace = useSharedFurnitureWorkspace()
+  const { document: roomDocument } = useSharedRoomDocument()
   const [showIntake, setShowIntake] = useState(false)
   const [editingFurniture, setEditingFurniture] = useState(null)
 
@@ -92,7 +95,7 @@ export default function FurniturePage() {
             const pendingLabel = getRepresentationStatusLabel(furniture)
             const spatialLabel = getSpatialStatusLabel(facts) ?? (placement ? '摆放状态待确认' : '尚未放入小屋')
             return (
-              <article key={furniture.id} className="furniture-owned-row">
+              <article key={furniture.id} className={`furniture-owned-row ${furniture.ownership.type === 'NONE' && furniture.lifecycle.status === 'WISHLIST' ? 'wishlist-decision-row' : ''}`}>
                 <div>
                   <strong>{getFurnitureName(furniture)}</strong>
                   <span>{getFurnitureTypeLabel(furniture)} · {getFurnitureRelationLabel(furniture)}</span>
@@ -110,6 +113,7 @@ export default function FurniturePage() {
                   {furniture.ownership.type === 'NONE' && furniture.lifecycle.status === 'WISHLIST' && <button type="button" onClick={() => workspace.dispatchInteractionCommand(createPurchaseFurnitureCommand(furniture.id))}>已购买</button>}
                   <button type="button" onClick={() => workspace.dispatchInteractionCommand(createRemoveFurnitureCommand(furniture.id))}>删除家具</button>
                 </div>
+                {furniture.ownership.type === 'NONE' && furniture.lifecycle.status === 'WISHLIST' && <PurchaseDecisionPanel furniture={furniture} roomDocument={roomDocument} placement={placement} spatialAnalysis={workspace.spatialAnalysis} />}
               </article>
             )
           })}

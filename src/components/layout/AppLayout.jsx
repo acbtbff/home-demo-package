@@ -9,14 +9,14 @@ export default function AppLayout() {
     <div className="app-layout">
       <header className="app-header">
         <NavLink to="/" className="app-brand">
-          <span className="app-brand-mark">屋</span>
+          <span className="app-brand-mark">🐷</span>
           <span>
-            <strong>我的小屋</strong>
-            <small>Room Studio</small>
+            <strong>MYROOMIE</strong>
+            <small>数字小屋</small>
           </span>
         </NavLink>
         <nav className="app-nav" aria-label="主导航">
-          <NavLink to="/" end className={navigationClass}>我的小屋</NavLink>
+          <NavLink to="/room" className={navigationClass}>我的小屋</NavLink>
           <NavLink to="/furniture" className={navigationClass}>我的家具</NavLink>
           <button type="button" className="app-nav-link app-nav-placeholder" disabled>用户</button>
           <button type="button" className="app-nav-link app-nav-placeholder" disabled>社区</button>

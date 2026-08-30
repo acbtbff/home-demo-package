@@ -140,3 +140,32 @@ button.active { border-color: #c97800; color: #7a4700; background: #fff4d6; }
   .furniture-owned-row { grid-template-columns: 1fr; gap: 10px; }
   .furniture-owned-actions { justify-content: flex-start; }
 }
+.gesture-camera-source {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.room-sidebar .gesture-toggle.active {
+  border-color: #d97706;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.gesture-status {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.68);
+  color: #475569;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.gesture-status strong {
+  color: #1f2937;
+  font-size: 0.76rem;
+}

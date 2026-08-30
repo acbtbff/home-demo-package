@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { MOUSE } from 'three'
@@ -14,6 +14,7 @@ import { useSharedFurnitureWorkspace } from '../state/useSharedFurnitureWorkspac
 import CozyLighting from '../styles/cozy/CozyLighting.jsx'
 import FurnitureIntakePanel from '../components/furniture/FurnitureIntakePanel.jsx'
 import { createSelectFurnitureCommand } from '../domain/interactionCommands.js'
+import GestureCameraController from '../integration/GestureCameraController.jsx'
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
@@ -37,6 +38,23 @@ export default function RoomPage() {
   const [isDragging, setIsDragging] = useState(false)
   const [styleMode, setStyleMode] = useState('ORIGINAL')
   const [showIntake, setShowIntake] = useState(false)
+  const [gestureEnabled, setGestureEnabled] = useState(false)
+  const [gestureManipulating, setGestureManipulating] = useState(false)
+  const [gestureStatus, setGestureStatus] = useState('手势控制：已关闭')
+  const canvasStateRef = useRef(null)
+  const orbitControlsRef = useRef(null)
+  const updateGestureStatus = useCallback((status) => setGestureStatus(status), [])
+  const updateGestureManipulation = useCallback((active) => setGestureManipulating(active), [])
+  const toggleGesture = () => {
+    setGestureEnabled((enabled) => {
+      const next = !enabled
+      if (!next) {
+        setGestureManipulating(false)
+        setGestureStatus('手势控制：已关闭')
+      }
+      return next
+    })
+  }
   const nextStyleMode = () => setStyleMode((value) => value === 'ORIGINAL' ? 'COZY_V0' : value === 'COZY_V0' ? 'COZY_V0_GEOMETRY' : 'ORIGINAL')
   const bounds = useMemo(() => getExteriorWallsBounds(document.walls), [document.walls])
   const defaultFurniture = furnitureWorkspace.furnitureItems[0] ?? null
@@ -58,7 +76,7 @@ export default function RoomPage() {
 
   return (
     <main className="app-shell room-page">
-      <Canvas shadows camera={{ position: [8.8, 7.2, 8.8], fov: 42, near: 0.1, far: 100 }} dpr={[1, 2]} onPointerMissed={() => furnitureWorkspace.dispatchInteractionCommand(createSelectFurnitureCommand(null))}>
+      <Canvas shadows camera={{ position: [8.8, 7.2, 8.8], fov: 42, near: 0.1, far: 100 }} dpr={[1, 2]} onCreated={(state) => { canvasStateRef.current = state }} onPointerMissed={() => furnitureWorkspace.dispatchInteractionCommand(createSelectFurnitureCommand(null))}>
         <color attach="background" args={[styleMode !== 'ORIGINAL' ? '#F2EFE8' : '#cfd9dd']} />
         {styleMode !== 'ORIGINAL' ? <CozyLighting /> : <><ambientLight intensity={0.8} /><directionalLight castShadow position={[4, 9, 6]} intensity={1.5} shadow-mapSize-width={2048} shadow-mapSize-height={2048} /></>}
         <Room
@@ -86,8 +104,16 @@ export default function RoomPage() {
           ) : null
         })}
         <gridHelper args={[14, 28, '#809098', '#b2bdc2']} position={[0, 0.005, 0]} />
-        <OrbitControls makeDefault enabled={!isDragging} target={[0, 0.8, 0]} enableDamping minDistance={4} maxDistance={20} mouseButtons={{ LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE }} />
+        <OrbitControls ref={orbitControlsRef} makeDefault enabled={!isDragging && !gestureManipulating} target={[0, 0.8, 0]} enableDamping minDistance={4} maxDistance={20} mouseButtons={{ LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE }} />
       </Canvas>
+
+      {gestureEnabled && <GestureCameraController
+        furnitureWorkspace={furnitureWorkspace}
+        canvasStateRef={canvasStateRef}
+        orbitControlsRef={orbitControlsRef}
+        onStatus={updateGestureStatus}
+        onManipulationChange={updateGestureManipulation}
+      />}
 
       <div className="room-topbar">
         <div><strong>3D 小屋</strong><span>按真实尺寸预览家具，拖动或旋转来调整摆放。</span></div>
@@ -104,6 +130,9 @@ export default function RoomPage() {
         <button type="button" onClick={() => navigate('/furniture')}>我的家具</button>
         <button type="button" onClick={() => setShowIntake(true)}>＋ 添加家具</button>
         <button type="button" onClick={() => navigate('/furniture')}>愿望清单</button>
+        <div className="room-sidebar-divider" />
+        <button className={gestureEnabled ? 'gesture-toggle active' : 'gesture-toggle'} type="button" aria-pressed={gestureEnabled} onClick={toggleGesture}>手势控制：{gestureEnabled ? '关闭' : '开启'}</button>
+        <div className="gesture-status" role="status"><strong>{gestureStatus}</strong><span>摄像头画面仅用于本地手势识别，不会上传。</span></div>
         <div className="room-sidebar-divider" />
         <span className="room-sidebar-note">拖动家具调整位置<br />右键或 Shift 旋转</span>
       </aside>

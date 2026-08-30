@@ -13,6 +13,61 @@ export const ASSET_STATUSES = Object.freeze({
   UNAVAILABLE: 'UNAVAILABLE',
 })
 
+export const LIBRARY_ASPECT_RATIO_POLICY = Object.freeze({
+  // Relative deviation above this value is surfaced as a contract warning.
+  // V0 does not attempt asset matching or silently change physical dimensions.
+  maxRelativeDeviation: 0.35,
+  severeAction: 'WARN_AND_REVIEW_ASSET',
+})
+
+function positiveDimensions(value) {
+  const width = Number(value?.width)
+  const depth = Number(value?.depth)
+  const height = Number(value?.height)
+  if (![width, depth, height].every((item) => Number.isFinite(item) && item > 0)) return null
+  return { width, depth, height }
+}
+
+function aspectRatios(dimensions) {
+  return {
+    widthDepth: dimensions.width / dimensions.depth,
+    widthHeight: dimensions.width / dimensions.height,
+    depthHeight: dimensions.depth / dimensions.height,
+  }
+}
+
+/**
+ * Calculate LIBRARY calibration from an asset bounding box to canonical
+ * Furniture dimensions. Bounding-box dimensions are inputs to visual
+ * calibration only and never become Furniture physical facts.
+ */
+export function calculateLibraryVisualCalibration({ assetDimensionsM, targetDimensionsM, maxRelativeDeviation = LIBRARY_ASPECT_RATIO_POLICY.maxRelativeDeviation } = {}) {
+  const asset = positiveDimensions(assetDimensionsM)
+  const target = positiveDimensions(targetDimensionsM)
+  if (!asset || !target) {
+    return {
+      scale: null,
+      aspectRatioDeviation: null,
+      severeAspectMismatch: false,
+      canCalibrate: false,
+    }
+  }
+
+  const assetAspect = aspectRatios(asset)
+  const targetAspect = aspectRatios(target)
+  const deviations = Object.keys(assetAspect).map((key) => Math.abs(assetAspect[key] - targetAspect[key]) / targetAspect[key])
+  const aspectRatioDeviation = Math.max(...deviations)
+
+  return {
+    scale: [target.width / asset.width, target.height / asset.height, target.depth / asset.depth],
+    aspectRatioDeviation,
+    severeAspectMismatch: aspectRatioDeviation > maxRelativeDeviation,
+    canCalibrate: true,
+  }
+}
+
+export const getLibraryVisualCalibration = calculateLibraryVisualCalibration
+
 export function createAssetContract(input = {}) {
   const semantic = normalizeFurnitureSemantic(input.archetype ?? input.semanticMatch ?? input)
   return Object.freeze({
@@ -52,6 +107,22 @@ export const OFFICE_CHAIR_LIBRARY_ASSET_V0 = createAssetContract({
     rotationY: -0.31996933,
     rotationZ: 0.00456702,
     rotationOrder: 'YXZ',
+  },
+})
+
+export const OFFICE_CHAIR_COZY_GEOMETRY_ASSET_V0 = createAssetContract({
+  id: 'office-chair-cozy-v0',
+  archetype: 'OFFICE_CHAIR',
+  modelUrl: '/assets/furniture/office-chair-cozy-v0.glb',
+  referenceDimensionsM: { width: null, depth: null, height: null },
+  styleFamily: 'COZY_V0',
+  source: ASSET_SOURCES.INTERNAL,
+  status: ASSET_STATUSES.READY,
+  normalization: {
+    rotationX: OFFICE_CHAIR_LIBRARY_ASSET_V0.normalization.rotationX,
+    rotationY: OFFICE_CHAIR_LIBRARY_ASSET_V0.normalization.rotationY,
+    rotationZ: OFFICE_CHAIR_LIBRARY_ASSET_V0.normalization.rotationZ,
+    rotationOrder: OFFICE_CHAIR_LIBRARY_ASSET_V0.normalization.rotationOrder,
   },
 })
 

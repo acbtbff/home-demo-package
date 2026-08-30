@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import { LifecycleStatus, OwnershipType } from '../src/decision/common/enums.js'
+import { createPurchaseDecisionInput, validatePurchaseDecisionInput } from '../src/decision/purchase/purchaseInputSchema.js'
+import { purchaseInputExample } from '../src/decision/purchase/purchaseInputExample.js'
+import { createMoveDecisionInput, validateMoveDecisionInput } from '../src/decision/move/moveInputSchema.js'
+import { moveInputExample } from '../src/decision/move/moveInputExample.js'
+import { evaluateMoveEligibility } from '../src/decision/move/moveEligibility.js'
+test('fixtures validate without final decision fields', () => { assert.equal(validatePurchaseDecisionInput(purchaseInputExample).valid, true); assert.equal(validateMoveDecisionInput(moveInputExample).valid, true); assert.equal(Object.hasOwn(purchaseInputExample, 'decision'), false); assert.equal(Object.hasOwn(moveInputExample, 'decision'), false) })
+test('legacy lower-case values normalize', () => { const input = createMoveDecisionInput({ furniture: { lifecycleStatus: 'owned', ownershipType: 'personal' } }); assert.equal(input.furniture.lifecycleStatus, LifecycleStatus.OWNED); assert.equal(input.furniture.ownershipType, OwnershipType.PERSONAL); assert.equal(validateMoveDecisionInput(input).valid, true) })
+test('eligibility requires OWNED and PERSONAL', () => { assert.deepEqual(evaluateMoveEligibility({ lifecycleStatus: 'owned', ownershipType: 'personal' }), { eligible: true, reason: null }); for (const furniture of [{ lifecycleStatus: 'WISHLIST', ownershipType: 'PERSONAL' }, { lifecycleStatus: 'SOLD', ownershipType: 'PERSONAL' }, { lifecycleStatus: 'OWNED', ownershipType: 'UNKNOWN' }, { lifecycleStatus: 'OWNED', ownershipType: null }]) assert.deepEqual(evaluateMoveEligibility(furniture), { eligible: false, reason: 'NOT_PERSONAL_OWNED' }) })
+test('null is allowed and negative values are rejected', () => { assert.equal(validatePurchaseDecisionInput(createPurchaseDecisionInput()).valid, true); const result = validatePurchaseDecisionInput(createPurchaseDecisionInput({ furniture: { dimensions: { width: -1 }, priceCny: -10 } })); assert.equal(result.valid, false); assert.ok(result.errors.some(({ path }) => path === 'furniture.dimensions.width')); assert.ok(result.errors.some(({ path }) => path === 'furniture.priceCny')) })
+test('false favorite is neutral', () => { const input = createPurchaseDecisionInput({ furniture: { isFavorite: false } }); assert.equal(input.furniture.isFavorite, false); assert.equal(Object.hasOwn(input.furniture, 'likeLevel'), false) })

@@ -1,18 +1,23 @@
 import ParametricDesk from './ParametricDesk.jsx'
 import LibraryGlbModel from './LibraryGlbModel.jsx'
-import { resolveFurnitureAsset } from '../../domain/furnitureAssets.js'
+import { OFFICE_CHAIR_COZY_GEOMETRY_ASSET_V0 } from '../../domain/furnitureAssets.js'
+import { resolveFurnitureModel } from '../../domain/furnitureModelResolver.js'
 
-export default function FurnitureVisualModel({ furniture, warning = false }) {
+export default function FurnitureVisualModel({ furniture, warning = false, styleMode = 'ORIGINAL' }) {
   if (!furniture) return null
 
-  if (furniture.modelStrategy.resolved === 'PARAMETRIC' && furniture.semantic.archetype === 'DESK') {
-    return <ParametricDesk dimensionsM={furniture.physical.dimensionsM} warning={warning} />
+  const resolution = resolveFurnitureModel(furniture)
+
+  if (resolution.visualModelAvailable && resolution.strategy === 'PARAMETRIC' && resolution.generatorKey === 'DESK') {
+    return <ParametricDesk dimensionsM={furniture.physical.dimensionsM} warning={warning} styleMode={styleMode} wishlist={furniture.lifecycle?.status === 'WISHLIST'} />
   }
 
-  if (furniture.modelStrategy.resolved === 'LIBRARY' || furniture.modelStrategy.resolved === 'GENERATED') {
-    const { asset } = resolveFurnitureAsset(furniture)
+  if (resolution.visualModelAvailable && resolution.strategy === 'LIBRARY') {
+    const asset = styleMode === 'COZY_V0_GEOMETRY' && furniture.semantic.archetype === 'OFFICE_CHAIR'
+      ? OFFICE_CHAIR_COZY_GEOMETRY_ASSET_V0
+      : resolution.asset
     if (asset?.modelUrl?.endsWith('.glb')) {
-      return <LibraryGlbModel furniture={furniture} asset={asset} warning={warning} />
+      return <LibraryGlbModel furniture={furniture} asset={asset} warning={warning} styleMode={styleMode} wishlist={furniture.lifecycle?.status === 'WISHLIST'} />
     }
   }
 

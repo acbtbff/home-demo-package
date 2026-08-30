@@ -13,6 +13,10 @@ export const FURNITURE_COMMAND_TYPES = Object.freeze({
   TOGGLE_GEOMETRY_PROXY: 'TOGGLE_GEOMETRY_PROXY',
   ADD_FURNITURE: 'ADD_FURNITURE',
   REMOVE_FURNITURE: 'REMOVE_FURNITURE',
+  CREATE_FURNITURE: 'CREATE_FURNITURE',
+  CREATE_PLACEMENT: 'CREATE_PLACEMENT',
+  UPDATE_FURNITURE_INFO: 'UPDATE_FURNITURE_INFO',
+  PURCHASE_FURNITURE: 'PURCHASE_FURNITURE',
 })
 
 export function createOrbitCameraCommand({ deltaYaw = 0, deltaPitch = 0 } = {}) {
@@ -86,6 +90,20 @@ export function createRemoveFurnitureCommand(furnitureId) {
     type: FURNITURE_COMMAND_TYPES.REMOVE_FURNITURE,
     furnitureId,
   }
+}
+
+export function createCreateFurnitureCommand(furnitureInput) {
+  return { type: FURNITURE_COMMAND_TYPES.CREATE_FURNITURE, furnitureInput }
+}
+
+export function createCreatePlacementCommand(furnitureId) {
+  return { type: FURNITURE_COMMAND_TYPES.CREATE_PLACEMENT, furnitureId }
+}
+export function createUpdateFurnitureInfoCommand({ furnitureId, patch = {} } = {}) {
+  return { type: FURNITURE_COMMAND_TYPES.UPDATE_FURNITURE_INFO, furnitureId, patch }
+}
+export function createPurchaseFurnitureCommand(furnitureId) {
+  return { type: FURNITURE_COMMAND_TYPES.PURCHASE_FURNITURE, furnitureId }
 }
 
 export function isRoomCameraCommand(command) {

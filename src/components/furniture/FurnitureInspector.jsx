@@ -6,6 +6,13 @@ import {
   createAddFurnitureCommand,
   createRemoveFurnitureCommand,
 } from '../../domain/interactionCommands.js'
+import {
+  formatFurnitureDimensions,
+  getFurnitureName,
+  getFurnitureRelationLabel,
+  getFurnitureTypeLabel,
+  getSpatialStatusLabel,
+} from '../../presentation/furnitureLabels.js'
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 const metersToCm = (value) => Math.round((value ?? 0) * 100)
@@ -80,11 +87,11 @@ export default function FurnitureInspector({
       <section>
         <h2>家具</h2>
         <p className="hint">单击家具或从列表选择后可拖动、旋转并编辑尺寸。</p>
-        <h3>Furniture</h3>
+        <h3>添加家具</h3>
         <div className="furniture-list">
           {catalogItems.map((item) => (
             <button key={item.catalogId} onClick={() => dispatchFurnitureCommand(createAddFurnitureCommand(item))}>
-              添加 {item.name}
+              放入小屋 · {getFurnitureName(item)}
             </button>
           ))}
         </div>
@@ -95,7 +102,7 @@ export default function FurnitureInspector({
               className={item.id === furniture.id ? 'primary' : ''}
               onClick={() => dispatchFurnitureCommand(createSelectFurnitureCommand(item.id))}
             >
-              {item.name}
+              {getFurnitureName(item)}
             </button>
           ))}
         </div>
@@ -105,26 +112,28 @@ export default function FurnitureInspector({
 
   return (
     <section>
-      <h2>{furniture.name}</h2>
-      <p className="hint">{furniture.semantic.category} · {furniture.semantic.archetype} · {furniture.modelStrategy.resolved}</p>
+      <h2>{getFurnitureName(furniture)}</h2>
+      <p className="hint">{getFurnitureTypeLabel(furniture)} · {formatFurnitureDimensions(furniture)} · {getFurnitureRelationLabel(furniture)}</p>
+      {furniture.product?.price != null && <p className="geometry-proxy-readout">价格：¥{furniture.product.price}</p>}
+      {furniture.product?.url && <p className="hint">商品来源：{furniture.product.url}</p>}
       <button className="active" onClick={toggleSelection}>取消选中</button>
-      <button onClick={() => dispatchFurnitureCommand(createRemoveFurnitureCommand(furniture.id))}>Remove</button>
+      <button onClick={() => dispatchFurnitureCommand(createRemoveFurnitureCommand(furniture.id))}>删除家具</button>
       <CmField label="宽度" valueM={furniture.physical.dimensionsM.width} minCm={60} maxCm={300} onChange={(width) => updateDimensions({ width })} />
       <CmField label="深度" valueM={furniture.physical.dimensionsM.depth} minCm={35} maxCm={120} onChange={(depth) => updateDimensions({ depth })} />
       <CmField label="高度" valueM={furniture.physical.dimensionsM.height} minCm={45} maxCm={120} onChange={(height) => updateDimensions({ height })} />
       <DegreeField label="旋转" value={placement.rotationY} onChange={updateRotation} />
-      <label className="debug-toggle">
-        <input type="checkbox" checked={showGeometryProxy} onChange={(event) => dispatchFurnitureCommand(createToggleGeometryProxyCommand(event.target.checked))} />
-        <span>Show GeometryProxy</span>
-      </label>
-      <p className="geometry-proxy-readout">
-        Proxy BOX · {metersToCm(geometryProxy.dimensionsM.width)} × {metersToCm(geometryProxy.dimensionsM.depth)} × {metersToCm(geometryProxy.dimensionsM.height)} cm
-      </p>
-      {spatialFacts && (
-        <p className="geometry-proxy-readout">
-          {spatialFacts.collisionDetected ? 'Collision: yes' : 'Collision: no'} · {spatialFacts.outOfBounds ? 'Out of bounds: yes' : 'Out of bounds: no'}
-        </p>
-      )}
+      {import.meta.env.DEV && <>
+        <label className="debug-toggle">
+          <input type="checkbox" checked={showGeometryProxy} onChange={(event) => dispatchFurnitureCommand(createToggleGeometryProxyCommand(event.target.checked))} />
+          <span>显示调试碰撞框</span>
+        </label>
+        {geometryProxy && <p className="geometry-proxy-readout">
+          调试尺寸 · {metersToCm(geometryProxy.dimensionsM.width)} × {metersToCm(geometryProxy.dimensionsM.depth)} × {metersToCm(geometryProxy.dimensionsM.height)} cm
+        </p>}
+      </>}
+      {getSpatialStatusLabel(spatialFacts) && <p className={`spatial-status ${spatialFacts?.collisionDetected || spatialFacts?.outOfBounds ? 'warning' : 'ok'}`}>
+        {getSpatialStatusLabel(spatialFacts)}
+      </p>}
       <div className="furniture-list">
         {furnitureItems.map((item) => (
           <button
@@ -132,15 +141,15 @@ export default function FurnitureInspector({
             className={item.id === furniture.id ? 'primary' : ''}
             onClick={() => dispatchFurnitureCommand(createSelectFurnitureCommand(item.id))}
           >
-            {item.name}
+            {getFurnitureName(item)}
           </button>
         ))}
       </div>
-      <h3>Furniture</h3>
+      <h3>添加家具</h3>
       <div className="furniture-list">
         {catalogItems.map((item) => (
           <button key={item.catalogId} onClick={() => dispatchFurnitureCommand(createAddFurnitureCommand(item))}>
-            添加 {item.name}
+            放入小屋 · {getFurnitureName(item)}
           </button>
         ))}
       </div>

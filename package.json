@@ -11,6 +11,7 @@
     "vision:server": "node server/photoVisionServer.mjs",
     "build": "vite build",
     "lint": "oxlint",
+    "report:furniture-coverage": "node scripts/reportFurnitureCoverage.mjs",
     "preview": "vite preview",
     "test:contracts": "node --test tests/*.test.mjs"
   },

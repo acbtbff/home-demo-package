@@ -16,6 +16,7 @@ import { createFurniture } from '../domain/furnitureSchema.js'
 import { createPlacement } from '../domain/spatialContracts.js'
 import { getExteriorWallsBounds } from '../domain/roomGeometry.js'
 import { getFurnitureCatalogItem } from '../data/furnitureCatalog.js'
+import { createFurnitureFromIntake } from '../domain/furnitureIntake.js'
 
 const createFurnitureMap = () => ({
   [DEMO_DESK_FURNITURE.id]: structuredClone(DEMO_DESK_FURNITURE),
@@ -41,6 +42,18 @@ function updateFurnitureDimensions(furniture, patch) {
         ...patch,
       },
     },
+  }
+}
+function updateFurnitureInfo(furniture, patch) {
+  const dimensionsM = patch.dimensionsM ? { ...furniture.physical.dimensionsM, ...patch.dimensionsM } : furniture.physical.dimensionsM
+  return {
+    ...furniture,
+    name: patch.name ?? furniture.name,
+    physical: { ...furniture.physical, dimensionsM },
+    ownership: patch.ownershipType ? { ...furniture.ownership, type: patch.ownershipType } : furniture.ownership,
+    lifecycle: patch.lifecycleStatus ? { ...furniture.lifecycle, status: patch.lifecycleStatus } : furniture.lifecycle,
+    product: patch.product ? { ...furniture.product, ...patch.product } : furniture.product,
+    intakeMetadata: patch.intakeMetadata ? { ...furniture.intakeMetadata, ...patch.intakeMetadata } : furniture.intakeMetadata,
   }
 }
 
@@ -110,6 +123,17 @@ function addFurnitureFromCatalog(state, catalogItem, roomDocument) {
   return state
 }
 
+function findPlacementForFurniture(state, furnitureId, roomDocument) {
+  if (!roomDocument || !state.furnitureById[furnitureId]) return null
+  const bounds = getExteriorWallsBounds(roomDocument.walls)
+  for (const offset of INITIAL_PLACEMENT_OFFSETS) {
+    const placement = createPlacement({ id: `placement-${furnitureId}`, furnitureId, roomId: roomDocument.room.id, position: { x: bounds.centerX + offset.x, y: 0, z: bounds.centerZ + offset.z } })
+    const placementsById = updatePlacementMap(state.placementsById, placement)
+    if (isPlacementAllowed({ roomDocument, state, furnitureId, candidatePlacementsById: placementsById })) return placement
+  }
+  return null
+}
+
 export function reduceFurnitureWorkspace(state, command, roomDocument = null) {
   if (!command) return state
 
@@ -120,6 +144,20 @@ export function reduceFurnitureWorkspace(state, command, roomDocument = null) {
   if (!isFurnitureCommand(command)) return state
 
   switch (command.type) {
+    case FURNITURE_COMMAND_TYPES.CREATE_FURNITURE: {
+      const sequence = state.nextFurnitureSequence
+      let furniture
+      try {
+        furniture = createFurnitureFromIntake({ ...command.furnitureInput, id: command.furnitureInput?.id ?? `intake-${sequence}` })
+      } catch {
+        return state
+      }
+      return { ...state, furnitureById: { ...state.furnitureById, [furniture.id]: furniture }, selectedFurnitureId: furniture.id, nextFurnitureSequence: sequence + 1 }
+    }
+    case FURNITURE_COMMAND_TYPES.CREATE_PLACEMENT: {
+      const placement = findPlacementForFurniture(state, command.furnitureId, roomDocument)
+      return placement ? { ...state, placementsById: updatePlacementMap(state.placementsById, placement), selectedFurnitureId: command.furnitureId } : state
+    }
     case FURNITURE_COMMAND_TYPES.ADD_FURNITURE:
       return addFurnitureFromCatalog(state, getFurnitureCatalogItem(command.catalogId), roomDocument)
     case FURNITURE_COMMAND_TYPES.REMOVE_FURNITURE: {
@@ -237,6 +275,16 @@ export function reduceFurnitureWorkspace(state, command, roomDocument = null) {
           [furniture.id]: updateFurnitureDimensions(furniture, command.patch ?? {}),
         },
       }
+    }
+    case FURNITURE_COMMAND_TYPES.UPDATE_FURNITURE_INFO: {
+      const furniture = state.furnitureById[command.furnitureId]
+      if (!furniture) return state
+      return { ...state, furnitureById: { ...state.furnitureById, [furniture.id]: updateFurnitureInfo(furniture, command.patch ?? {}) } }
+    }
+    case FURNITURE_COMMAND_TYPES.PURCHASE_FURNITURE: {
+      const furniture = state.furnitureById[command.furnitureId]
+      if (!furniture || furniture.ownership.type !== 'NONE' || furniture.lifecycle.status !== 'WISHLIST') return state
+      return { ...state, furnitureById: { ...state.furnitureById, [furniture.id]: { ...furniture, ownership: { ...furniture.ownership, type: 'USER' }, lifecycle: { ...furniture.lifecycle, status: 'OWNED' } } } }
     }
     case FURNITURE_COMMAND_TYPES.TOGGLE_GEOMETRY_PROXY:
       return { ...state, showGeometryProxy: command.show }

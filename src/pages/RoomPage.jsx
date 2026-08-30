@@ -11,6 +11,8 @@ import { createGeometryProxyFromFurniture } from '../domain/spatialContracts.js'
 import { FURNITURE_CATALOG_V0 } from '../data/furnitureCatalog.js'
 import { useSharedRoomDocument } from '../state/useSharedRoomDocument.js'
 import { useSharedFurnitureWorkspace } from '../state/useSharedFurnitureWorkspace.js'
+import CozyLighting from '../styles/cozy/CozyLighting.jsx'
+import FurnitureIntakePanel from '../components/furniture/FurnitureIntakePanel.jsx'
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
@@ -32,6 +34,9 @@ export default function RoomPage() {
   const furnitureWorkspace = useSharedFurnitureWorkspace()
   const [editWalls, setEditWalls] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
+  const [styleMode, setStyleMode] = useState('ORIGINAL')
+  const [showIntake, setShowIntake] = useState(false)
+  const nextStyleMode = () => setStyleMode((value) => value === 'ORIGINAL' ? 'COZY_V0' : value === 'COZY_V0' ? 'COZY_V0_GEOMETRY' : 'ORIGINAL')
   const bounds = useMemo(() => getExteriorWallsBounds(document.walls), [document.walls])
   const defaultFurniture = furnitureWorkspace.furnitureItems[0] ?? null
   const defaultPlacement = defaultFurniture
@@ -63,14 +68,14 @@ export default function RoomPage() {
   return (
     <main className="app-shell room-page">
       <Canvas shadows camera={{ position: [8.8, 7.2, 8.8], fov: 42, near: 0.1, far: 100 }} dpr={[1, 2]}>
-        <color attach="background" args={['#cfd9dd']} />
-        <ambientLight intensity={0.8} />
-        <directionalLight castShadow position={[4, 9, 6]} intensity={1.5} shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
+        <color attach="background" args={[styleMode !== 'ORIGINAL' ? '#F2EFE8' : '#cfd9dd']} />
+        {styleMode !== 'ORIGINAL' ? <CozyLighting /> : <><ambientLight intensity={0.8} /><directionalLight castShadow position={[4, 9, 6]} intensity={1.5} shadow-mapSize-width={2048} shadow-mapSize-height={2048} /></>}
         <Room
           document={document}
           editWalls={editWalls}
           onDimensionDrag={(field, value) => resizeRoom(field, clamp(value, field === 'width' ? 2 : 2.5, field === 'width' ? 12 : 8))}
           onDragStateChange={setIsDragging}
+          styleMode={styleMode}
         />
         {furnitureWorkspace.furnitureItems.map((furniture) => {
           const placement = Object.values(furnitureWorkspace.effectivePlacementsById)
@@ -85,6 +90,7 @@ export default function RoomPage() {
               spatialFacts={furnitureWorkspace.spatialAnalysis.byFurnitureId[furniture.id] ?? null}
               dispatchFurnitureCommand={furnitureWorkspace.dispatchInteractionCommand}
               onDragStateChange={setIsDragging}
+              styleMode={styleMode}
             />
           ) : null
         })}
@@ -93,7 +99,8 @@ export default function RoomPage() {
       </Canvas>
 
       <div className="room-topbar">
-        <div><strong>3D 小屋</strong><span>Demo 户型 3.2 × 5.0 × 2.7 m · PARAMETRIC/LIBRARY 已接入 · GENERATED 接口预留</span></div>
+        <div><strong>3D 小屋</strong><span>按真实尺寸预览家具，拖动或旋转来调整摆放。</span></div>
+        <button className="active" type="button" onClick={nextStyleMode}>灯光样式：{styleMode === 'ORIGINAL' ? '标准' : '温馨'}</button>
         <button className={editWalls ? 'active' : ''} onClick={() => setEditWalls((value) => !value)}>{editWalls ? '墙体拖动：开' : '墙体拖动：关'}</button>
       </div>
 
@@ -104,6 +111,7 @@ export default function RoomPage() {
         <button className="selected" type="button">空间分析</button>
         <button type="button" onClick={() => navigate('/floorplan')}>我的户型</button>
         <button type="button" onClick={() => navigate('/furniture')}>我的家具</button>
+        <button type="button" onClick={() => setShowIntake(true)}>＋ 添加家具</button>
         <button type="button">愿望清单</button>
         <div className="room-sidebar-divider" />
         <button type="button" disabled>撤销</button>
@@ -150,6 +158,7 @@ export default function RoomPage() {
         <button className="reset-button" onClick={() => navigate('/floorplan')}>返回编辑户型</button>
       </aside>
       <div className="legend"><span className="orange-dot" />家具左键拖动 · Shift/右键拖家具旋转 · 橙色手柄改房间 · 滚轮缩放</div>
+      {showIntake && <FurnitureIntakePanel workspace={furnitureWorkspace} onClose={() => setShowIntake(false)} />}
     </main>
   )
 }

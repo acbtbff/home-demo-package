@@ -99,8 +99,8 @@ export default function RoomPage() {
       </Canvas>
 
       <div className="room-topbar">
-        <div><strong>3D 小屋</strong><span>Demo 户型 3.2 × 5.0 × 2.7 m · PARAMETRIC/LIBRARY 已接入 · GENERATED 接口预留</span></div>
-        <button className="active" type="button" onClick={nextStyleMode}>Style: {styleMode}</button>
+        <div><strong>3D 小屋</strong><span>按真实尺寸预览家具，拖动或旋转来调整摆放。</span></div>
+        <button className="active" type="button" onClick={nextStyleMode}>灯光样式：{styleMode === 'ORIGINAL' ? '标准' : '温馨'}</button>
         <button className={editWalls ? 'active' : ''} onClick={() => setEditWalls((value) => !value)}>{editWalls ? '墙体拖动：开' : '墙体拖动：关'}</button>
       </div>
 

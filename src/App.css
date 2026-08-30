@@ -112,6 +112,7 @@ button.active { border-color: #c97800; color: #7a4700; background: #fff4d6; }
 .strategy-parametric { color: #6b4c17; background: #fff2cf; }
 .strategy-library { color: #356a78; background: #e9f7fa; }
 .strategy-generated { color: #705485; background: #f3eefa; }
+.furniture-type-badge { align-self: flex-start; padding: 5px 8px; border-radius: 999px; color: #6b4c17; background: #fff2cf; font-size: 10px; font-weight: 700; }
 .furniture-owned-list { display: grid; gap: 10px; }
 .furniture-owned-row { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(260px, 1.5fr) auto; align-items: center; gap: 20px; padding: 14px 16px; border: 1px solid #e1e6e8; border-radius: 12px; background: #fff; }
 .furniture-owned-row > div:first-child { display: flex; flex-direction: column; gap: 4px; }
@@ -120,6 +121,10 @@ button.active { border-color: #c97800; color: #7a4700; background: #fff4d6; }
 .furniture-owned-meta span { padding: 5px 7px; border-radius: 7px; color: #647279; background: #f2f5f5; font-size: 10px; }
 .furniture-owned-actions { display: flex; gap: 7px; }
 .furniture-empty { margin: 0; padding: 24px; border: 1px dashed #d6dcde; border-radius: 12px; color: #839096; text-align: center; }
+.spatial-status { margin: 12px 0; padding: 8px 10px; border-radius: 7px; color: #3f6f50; background: #edf8ef; font-size: 12px; }
+.spatial-status.warning { color: #8a5b13; background: #fff5df; }
+.status-ok { color: #3f6f50 !important; background: #edf8ef !important; }
+.status-warning { color: #8a5b13 !important; background: #fff5df !important; }
 
 @media (max-width: 840px) {
   .furniture-page { width: min(100% - 32px, 640px); padding-top: 28px; }

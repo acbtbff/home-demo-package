@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { runPurchaseDecision } from '../../decision/purchase/runPurchaseDecision.js'
+import { PURCHASE_DEMO_PRESET, PURCHASE_DEMO_PROFILE } from '../../data/decisionDemoPresets.js'
 
 const EMPTY_FORM = Object.freeze({
   needStrength: '', usageFrequency: '', substituteAvailable: '', substituteAdequacy: '',
   frictionFrequency: '', frictionSeverity: '', budget: '', stayMonths: '',
   moveCertainty: '', futureReuseProbability: '', returnable: '', trialAvailable: '',
+  physicalFit: '',
 })
+
 
 const DECISION_COPY = {
   BUY: { title: '建议购买', className: 'buy' },
@@ -46,6 +49,7 @@ export default function PurchaseDecisionPanel({ furniture, roomDocument, placeme
   const [result, setResult] = useState(null)
   const [running, setRunning] = useState(false)
   const change = (key, value) => { setForm((current) => ({ ...current, [key]: value })); setResult(null) }
+  const loadDemoPreset = () => { setForm({ ...PURCHASE_DEMO_PRESET }); setProfile({ ...PURCHASE_DEMO_PROFILE }); setResult(null) }
 
   const decide = async () => {
     setRunning(true)
@@ -62,6 +66,7 @@ export default function PurchaseDecisionPanel({ furniture, roomDocument, placeme
       overrides: {
         economicsContext: { availableFurnitureBudgetCny: nullableNumber(form.budget) },
         lifecycleContext: { expectedStayMonths: nullableNumber(form.stayMonths), moveCertainty: form.moveCertainty || null, futureReuseProbability: form.futureReuseProbability || null },
+        spaceContext: { physicalFit: form.physicalFit || null },
       },
     })
     setResult(next)
@@ -73,6 +78,7 @@ export default function PurchaseDecisionPanel({ furniture, roomDocument, placeme
     <button className="purchase-decision-trigger" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open}>购买决策 <span>{open ? '收起' : '开始'}</span></button>
     {open && <div className="purchase-decision-body">
       <p className="purchase-intro">基于这件心愿家具的真实信息与空间试摆结果生成建议。建议不会自动购买，也不会改变家具状态。</p>
+      <button className="demo-preset-button" type="button" onClick={loadDemoPreset}>载入购买演示案例</button>
       <div className="purchase-known-facts"><span>尺寸（只读）<strong>{Math.round(furniture.physical.dimensionsM.width * 100)} × {Math.round(furniture.physical.dimensionsM.depth * 100)} × {Math.round(furniture.physical.dimensionsM.height * 100)} cm</strong></span><span>商品价格<strong>{furniture.product?.price !== '' && furniture.product?.price != null ? `¥${furniture.product.price}` : '未填写'}</strong></span><span>空间试摆<strong>{placement ? (facts?.outOfBounds || facts?.collisionDetected ? '存在碰撞或越界' : '未发现碰撞或越界') : '尚未试摆'}</strong></span></div>
       <div className="purchase-form-grid">
         <SelectField label="实际需求强度" value={form.needStrength} onChange={(value) => change('needStrength', value)}><option value="LOW">低</option><option value="MEDIUM">中</option><option value="HIGH">高</option></SelectField>
@@ -85,6 +91,7 @@ export default function PurchaseDecisionPanel({ furniture, roomDocument, placeme
         <SelectField label="以后继续使用概率" value={form.futureReuseProbability} onChange={(value) => change('futureReuseProbability', value)}><option value="LOW">低</option><option value="MEDIUM">中</option><option value="HIGH">高</option></SelectField>
         <SelectField label="是否可退货" value={form.returnable} onChange={(value) => change('returnable', value)}><option value="true">可退货</option><option value="false">不可退货</option></SelectField>
         <SelectField label="是否支持试用" value={form.trialAvailable} onChange={(value) => change('trialAvailable', value)}><option value="true">支持</option><option value="false">不支持</option></SelectField>
+        <SelectField label="下一空间是否适配" value={form.physicalFit} onChange={(value) => change('physicalFit', value)}><option value="POSSIBLE">预计适配</option><option value="UNCERTAIN">暂不确定</option><option value="IMPOSSIBLE">明确不适配</option></SelectField>
       </div>
       <details className="purchase-preferences"><summary>我的购买偏好</summary><div className="purchase-form-grid">{[['budgetCaution', '预算谨慎程度'], ['spaceSensitivity', '空间敏感程度'], ['moveLightnessPreference', '轻装搬家偏好'], ['aestheticWeight', '审美重视程度']].map(([key, label]) => <SelectField key={key} label={label} value={profile[key]} onChange={(value) => { setProfile((current) => ({ ...current, [key]: value })); setResult(null) }}><option value="LOW">低</option><option value="MEDIUM">中</option><option value="HIGH">高</option></SelectField>)}</div></details>
       <button className="purchase-submit" type="button" disabled={running} onClick={decide}>{running ? '正在生成…' : '生成购买建议'}</button>

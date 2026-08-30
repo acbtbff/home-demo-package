@@ -138,7 +138,7 @@ export default function FurnitureInspector({
       {getSpatialStatusLabel(spatialFacts) && <p className={`spatial-status ${spatialFacts?.collisionDetected || spatialFacts?.outOfBounds ? 'warning' : 'ok'}`}>
         {getSpatialStatusLabel(spatialFacts)}
       </p>}
-      <DecisionCard key={furniture.id} furniture={furniture} placement={placement} roomDocument={roomDocument} spatialAnalysis={spatialAnalysis} userProfile={userProfile} />
+      {furniture.ownership?.type === 'USER' && furniture.lifecycle?.status === 'OWNED' && <DecisionCard key={furniture.id} furniture={furniture} placement={placement} roomDocument={roomDocument} spatialAnalysis={spatialAnalysis} userProfile={userProfile} />}
       <div className="furniture-list">
         {furnitureItems.map((item) => (
           <button

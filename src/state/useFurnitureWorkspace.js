@@ -2,8 +2,12 @@ import { useMemo, useState } from 'react'
 import {
   DEMO_DESK_FURNITURE,
   DEMO_DESK_PLACEMENT,
+  DEMO_OFFICE_CHAIR_FURNITURE,
+  DEMO_OFFICE_CHAIR_PLACEMENT,
   DEMO_TWO_SEAT_SOFA_FURNITURE,
   DEMO_TWO_SEAT_SOFA_PLACEMENT,
+  DEMO_WISHLIST_CHAIR_FURNITURE,
+  DEMO_WISHLIST_CHAIR_PLACEMENT,
 } from '../data/demoFurniture.js'
 import {
   FURNITURE_COMMAND_TYPES,
@@ -21,11 +25,18 @@ import { createFurnitureFromIntake } from '../domain/furnitureIntake.js'
 const createFurnitureMap = () => ({
   [DEMO_DESK_FURNITURE.id]: structuredClone(DEMO_DESK_FURNITURE),
   [DEMO_TWO_SEAT_SOFA_FURNITURE.id]: structuredClone(DEMO_TWO_SEAT_SOFA_FURNITURE),
+  [DEMO_OFFICE_CHAIR_FURNITURE.id]: structuredClone(DEMO_OFFICE_CHAIR_FURNITURE),
+  [DEMO_WISHLIST_CHAIR_FURNITURE.id]: structuredClone(DEMO_WISHLIST_CHAIR_FURNITURE),
 })
 
 const createPlacementMap = () => ({
   [DEMO_DESK_PLACEMENT.id]: structuredClone(DEMO_DESK_PLACEMENT),
   [DEMO_TWO_SEAT_SOFA_PLACEMENT.id]: structuredClone(DEMO_TWO_SEAT_SOFA_PLACEMENT),
+  [DEMO_OFFICE_CHAIR_PLACEMENT.id]: structuredClone(DEMO_OFFICE_CHAIR_PLACEMENT),
+})
+
+const createPreviewPlacementMap = () => ({
+  [DEMO_WISHLIST_CHAIR_PLACEMENT.id]: structuredClone(DEMO_WISHLIST_CHAIR_PLACEMENT),
 })
 
 function updatePlacementMap(placementsById, placement) {
@@ -297,7 +308,7 @@ export function createFurnitureWorkspaceState() {
   return {
     furnitureById: createFurnitureMap(),
     placementsById: createPlacementMap(),
-    previewPlacementsById: {},
+    previewPlacementsById: createPreviewPlacementMap(),
     activeFurnitureInteraction: null,
     selectedFurnitureId: null,
     nextFurnitureSequence: 1,

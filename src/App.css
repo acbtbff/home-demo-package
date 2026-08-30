@@ -190,3 +190,4 @@ button.active { border-color: #c97800; color: #7a4700; background: #fff4d6; }
 .room-sidebar .gesture-toggle.active { border-color: #d97706; background: #fff7ed; color: #9a3412; }
 .gesture-production-status { display: grid; gap: 0.25rem; padding: 0.6rem 0.7rem; border-radius: 0.65rem; background: rgba(255, 255, 255, 0.68); color: #475569; font-size: 0.72rem; line-height: 1.35; }
 .gesture-production-status strong { color: #1f2937; font-size: 0.76rem; }
+.demo-preset-button { width: fit-content; border-style: dashed; color: #7a4700; background: #fffaf0; font-size: 12px; }

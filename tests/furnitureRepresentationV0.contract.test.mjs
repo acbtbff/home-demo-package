@@ -209,7 +209,7 @@ assert.equal(DEMO_DESK_FURNITURE.physical.dimensionsM.width, 1.2)
 assert.equal(movedPlacement.position.x, 1)
 
 let workspace = createFurnitureWorkspaceState()
-assert.equal(Object.values(workspace.furnitureById).some((item) => item.semantic.archetype === 'OFFICE_CHAIR'), false)
+assert.equal(Object.values(workspace.furnitureById).some((item) => item.name === '办公椅' && item.semantic.archetype === 'OFFICE_CHAIR' && item.ownership.type === 'USER' && item.lifecycle.status === 'OWNED'), true)
 assert.equal(Object.values(workspace.placementsById).some((item) => item.furnitureId === 'demo-office-chair-001'), false)
 assert.deepEqual(FURNITURE_CATALOG_V0.map((item) => item.archetype), ['DESK', 'TWO_SEAT_SOFA', 'OFFICE_CHAIR', 'FLOOR_LAMP'])
 assert.equal(FURNITURE_CATALOG_V0.some((item) => Object.hasOwn(item, 'placement')), false)

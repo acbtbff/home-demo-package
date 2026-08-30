@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { evaluateMoveDecision } from '../../decision/orchestration/furnitureDecisionOrchestrator.js'
 import { createHttpAgentProvider } from '../../decision/agent/providers/httpAgentProvider.js'
 import { collectDecisionReasons, collectDecisionTradeoffs, formatConfidenceLabel, formatDecisionLabel, formatNextAction, formatSourceLabel } from './decisionDisplay.js'
+import { MOVE_DEMO_PRESET } from '../../data/decisionDemoPresets.js'
 
 const UNKNOWN = ''
 const toNullable = (value) => value === UNKNOWN ? null : value
@@ -29,6 +30,7 @@ export default function DecisionCard({ furniture, placement, roomDocument, spati
   const reasons = useMemo(() => collectDecisionReasons(result ?? {}), [result])
   const tradeoffs = useMemo(() => collectDecisionTradeoffs(result ?? {}), [result])
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }))
+  const loadDemoPreset = () => { setForm({ ...MOVE_DEMO_PRESET }); setResult(null); setError(null) }
 
   const evaluate = async () => {
     if (activeRequest.current) return
@@ -65,6 +67,7 @@ export default function DecisionCard({ furniture, placement, roomDocument, spati
     <section className="decision-card" aria-label="AI 家具决策">
       <div className="decision-card-heading"><div><span className="decision-card-eyebrow">AI 决策</span><h3>{furniture?.name ?? '这件家具'} · 搬家决策</h3></div>{result?.source && <span className="decision-source">{formatSourceLabel(result.source)}</span>}</div>
       {!result && <div className="decision-form">
+        <button className="demo-preset-button" type="button" onClick={loadDemoPreset}>载入搬家演示案例</button>
         <SelectField label="使用频率" value={form.usageFrequency} onChange={(value) => update('usageFrequency', value)}><option value="">未确认</option><option value="HIGH">高</option><option value="LOW">低</option></SelectField>
         <SelectField label="未来使用需求" value={form.expectedFutureUse} onChange={(value) => update('expectedFutureUse', value)}><option value="">未确认</option><option value="HIGH">高</option><option value="LOW">低</option></SelectField>
         <SelectField label="新家已有替代品" value={form.substituteAvailable} onChange={(value) => update('substituteAvailable', value)}><option value="">不确定</option><option value="YES">有</option><option value="NO">没有</option></SelectField>

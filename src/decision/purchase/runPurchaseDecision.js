@@ -31,7 +31,7 @@ export async function requestPurchaseAgentDecision(prepared, { fetchImpl = fetch
   if (prepared?.status !== 'NEEDS_AGENT') return { ok: false, error: { code: 'AGENT_NOT_REQUIRED' } }
   const agentInput = buildAgentInput({ decisionInput: prepared.input, hardRuleResult: prepared.hardRuleResult, evidence: prepared.evidence, modifiers: prepared.modifiers, resolverResult: prepared.resolverResult })
   try {
-    const response = await fetchImpl('/api/decision/agent-reason', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(agentInput) })
+    const response = await fetchImpl('/api/decision/agent-reason', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ agentInput }) })
     if (!response.ok) return { ok: false, error: { code: 'AGENT_REQUEST_FAILED', status: response.status } }
     const output = await response.json()
     const validation = validateAgentOutput(output, agentInput)

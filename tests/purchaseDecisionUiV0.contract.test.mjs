@@ -63,6 +63,7 @@ test('NEEDS_AGENT posts exactly once to the shared endpoint', async () => {
   assert.equal(result.agentOutput.decision, 'BUY')
   assert.equal(requests.length, 1)
   assert.equal(requests[0].url, '/api/decision/agent-reason')
+  assert.equal(JSON.parse(requests[0].options.body).agentInput.unresolvedContext.resolutionStatus, 'NEEDS_AGENT')
 })
 
 test('Agent failure never creates a fake decision', async () => {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { MOUSE } from 'three'
@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import Room from '../components/Room.jsx'
 import FurnitureInstance from '../components/furniture/FurnitureInstance.jsx'
 import FurnitureInspector from '../components/furniture/FurnitureInspector.jsx'
+import GestureCameraController from '../integration/GestureCameraController.jsx'
 import { getExteriorWallsBounds } from '../domain/roomGeometry.js'
 import { createGeometryProxyFromFurniture } from '../domain/spatialContracts.js'
 import { FURNITURE_CATALOG_V0 } from '../data/furnitureCatalog.js'
@@ -37,6 +38,9 @@ export default function RoomPage() {
   const [isDragging, setIsDragging] = useState(false)
   const [styleMode, setStyleMode] = useState('ORIGINAL')
   const [showIntake, setShowIntake] = useState(false)
+  const [gestureReadyFurnitureId, setGestureReadyFurnitureId] = useState(null)
+  const canvasStateRef = useRef(null)
+  const orbitControlsRef = useRef(null)
   const nextStyleMode = () => setStyleMode((value) => value === 'ORIGINAL' ? 'COZY_V0' : value === 'COZY_V0' ? 'COZY_V0_GEOMETRY' : 'ORIGINAL')
   const bounds = useMemo(() => getExteriorWallsBounds(document.walls), [document.walls])
   const defaultFurniture = furnitureWorkspace.furnitureItems[0] ?? null
@@ -58,7 +62,7 @@ export default function RoomPage() {
 
   return (
     <main className="app-shell room-page">
-      <Canvas shadows camera={{ position: [8.8, 7.2, 8.8], fov: 42, near: 0.1, far: 100 }} dpr={[1, 2]} onPointerMissed={() => furnitureWorkspace.dispatchInteractionCommand(createSelectFurnitureCommand(null))}>
+      <Canvas shadows camera={{ position: [8.8, 7.2, 8.8], fov: 42, near: 0.1, far: 100 }} dpr={[1, 2]} onCreated={(state) => { canvasStateRef.current = state }} onPointerMissed={() => furnitureWorkspace.dispatchInteractionCommand(createSelectFurnitureCommand(null))}>
         <color attach="background" args={[styleMode !== 'ORIGINAL' ? '#F2EFE8' : '#cfd9dd']} />
         {styleMode !== 'ORIGINAL' ? <CozyLighting /> : <><ambientLight intensity={0.8} /><directionalLight castShadow position={[4, 9, 6]} intensity={1.5} shadow-mapSize-width={2048} shadow-mapSize-height={2048} /></>}
         <Room
@@ -77,6 +81,7 @@ export default function RoomPage() {
               furniture={furniture}
               placement={placement}
               selected={furnitureWorkspace.selectedFurnitureId === furniture.id}
+              ready={gestureReadyFurnitureId === furniture.id}
               showGeometryProxy={furnitureWorkspace.showGeometryProxy}
               spatialFacts={furnitureWorkspace.spatialAnalysis.byFurnitureId[furniture.id] ?? null}
               dispatchFurnitureCommand={furnitureWorkspace.dispatchInteractionCommand}
@@ -86,8 +91,15 @@ export default function RoomPage() {
           ) : null
         })}
         <gridHelper args={[14, 28, '#809098', '#b2bdc2']} position={[0, 0.005, 0]} />
-        <OrbitControls makeDefault enabled={!isDragging} target={[0, 0.8, 0]} enableDamping minDistance={4} maxDistance={20} mouseButtons={{ LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE }} />
+        <OrbitControls ref={orbitControlsRef} makeDefault enabled={!isDragging} target={[0, 0.8, 0]} enableDamping minDistance={4} maxDistance={20} mouseButtons={{ LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE }} />
       </Canvas>
+
+      <GestureCameraController
+        furnitureWorkspace={furnitureWorkspace}
+        canvasStateRef={canvasStateRef}
+        orbitControlsRef={orbitControlsRef}
+        onReadyFurnitureIdChange={setGestureReadyFurnitureId}
+      />
 
       <div className="room-topbar">
         <div><strong>3D 小屋</strong><span>按真实尺寸预览家具，拖动或旋转来调整摆放。</span></div>

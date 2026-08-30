@@ -140,3 +140,13 @@ button.active { border-color: #c97800; color: #7a4700; background: #fff4d6; }
   .furniture-owned-row { grid-template-columns: 1fr; gap: 10px; }
   .furniture-owned-actions { justify-content: flex-start; }
 }
+/* Gesture input adapter overlay */
+.gesture-video { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.gesture-overlay { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.gesture-grab-handle { position: absolute; width: 20px; height: 20px; transform: translate(-50%, -50%); border: 2px solid rgba(39, 50, 56, 0.65); border-radius: 50%; background: rgba(255, 255, 255, 0.72); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35); }
+.gesture-grab-handle.is-ready { border-color: #eab308; background: rgba(234, 179, 8, 0.24); box-shadow: 0 0 0 5px rgba(234, 179, 8, 0.18); }
+.gesture-grab-handle.is-selected { border-color: #22c55e; background: rgba(34, 197, 94, 0.24); box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.18); }
+.gesture-cursor { position: absolute; width: 18px; height: 18px; transform: translate(-50%, -50%); border: 2px solid #f59e0b; border-radius: 50%; background: rgba(245, 158, 11, 0.18); box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.12); }
+.gesture-status { position: absolute; left: 50%; bottom: 54px; transform: translateX(-50%); padding: 8px 12px; border-radius: 8px; color: #526168; background: rgba(255, 255, 255, 0.86); font-size: 12px; }
+.gesture-status-error, .gesture-status-permission_denied { color: #7a3b2e; background: rgba(255, 239, 235, 0.94); }
+.gesture-mode-label { position: absolute; right: 18px; bottom: 18px; padding: 6px 9px; border-radius: 8px; color: #526168; background: rgba(255, 255, 255, 0.82); font-size: 11px; }

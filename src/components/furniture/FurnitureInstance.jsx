@@ -18,6 +18,7 @@ export default function FurnitureInstance({
   furniture,
   placement,
   selected,
+  ready = false,
   showGeometryProxy,
   spatialFacts = null,
   dispatchFurnitureCommand,
@@ -107,7 +108,7 @@ export default function FurnitureInstance({
           warning={Boolean(spatialFacts?.collisionDetected || spatialFacts?.outOfBounds)}
         />
       )}
-      {selected && (
+      {(selected || ready) && (
         <mesh name={`selection-ring:${furniture.id}`} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, 0]}>
           <ringGeometry args={[selectionRadius + 0.05, selectionRadius + 0.11, 48]} />
           <meshBasicMaterial color="#f59e0b" transparent opacity={0.65} />

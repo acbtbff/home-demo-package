@@ -1,11 +1,15 @@
-# Competition Checklist
+# Final V1 Competition Checklist
 
-- [ ] Double-click `START_MYROOMIE_DEMO.bat` and confirm the home page opens.
-- [ ] Visit `/floorplan`, `/room`, and `/furniture`.
-- [ ] Confirm parametric desk and library office chair render.
-- [ ] Add owned furniture and a wishlist product with image, name, price, and link.
-- [ ] Trial-place the wishlist item, edit dimensions, then mark it purchased.
-- [ ] Confirm generated furniture is labelled pending, not presented as completed.
-- [ ] Confirm decision UI uses the safe local/rule fallback when no provider is available.
-- [ ] Allow camera access on `/room`; verify Select, Move X/Z, and Rotate Y.
-- [ ] Double-click `STOP_MYROOMIE_DEMO.bat` after the presentation.
+- [ ] Confirm V0 remains available as emergency fallback.
+- [ ] Start V1 and visit `/`, `/floorplan`, `/room`, and `/furniture`.
+- [ ] Confirm desk, office chair, Intake, Wishlist, editing, collision, out-of-bounds and Purchased transition.
+- [ ] Move Decision: show one rules-only result, then one genuine tradeoff if Live Agent is available.
+- [ ] Purchase Decision: show one rules-only result with zero Agent requests.
+- [ ] Confirm Purchase BUY is advice only and does not mark the item purchased.
+- [ ] Confirm Move and Purchase use the same `/api/decision/agent-reason` provider boundary.
+- [ ] Confirm provider failure displays a safe message and the rest of the demo remains usable.
+- [ ] Gesture starts OFF; mouse interaction works before camera permission.
+- [ ] Enable Gesture explicitly and verify permission denial keeps mouse fallback working.
+- [ ] If camera/network are available, verify Select, Move X/Z, Rotate Y, Orbit, and Deselect.
+- [ ] Present Generated as `3D 模型待生成`; do not claim Image-to-3D is implemented.
+- [ ] Stop V1 using `STOP_MYROOMIE_DEMO.bat`.

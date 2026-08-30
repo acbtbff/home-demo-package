@@ -16,9 +16,9 @@ export async function reasonConflict({ agentInput, provider } = {}) {
     assertAgentProvider(provider)
     output = await provider.generateStructuredDecision({ systemInstruction: CONFLICT_REASONER_SYSTEM_INSTRUCTION, input: structuredClone(agentInput), outputSchema: 'furniture-agent-output-v0.3.1' })
   } catch (error) {
-    return { ok: false, error: { code: 'PROVIDER_ERROR', message: error?.message ?? 'Provider failed' } }
+    return { ok: false, error: { code: error?.code ?? 'PROVIDER_ERROR', message: error?.message ?? 'Provider failed' } }
   }
   const outputValidation = validateAgentOutput(output, agentInput)
-  if (!outputValidation.valid) return { ok: false, error: { code: 'INVALID_AGENT_OUTPUT', details: outputValidation.errors } }
+  if (!outputValidation.valid) return { ok: false, error: { code: 'INVALID_AGENT_OUTPUT', details: outputValidation.errors, validationIssues: outputValidation.issues } }
   return { ok: true, result: structuredClone(output) }
 }

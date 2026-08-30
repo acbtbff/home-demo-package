@@ -1,12 +1,14 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-if exist ".myroomie-demo.pid" (
-  echo MYROOMIE Demo may already be running. Run STOP_MYROOMIE_DEMO.bat first.
-  exit /b 1
-)
-powershell -NoProfile -Command "$p=Start-Process -FilePath 'cmd.exe' -ArgumentList '/c','pnpm preview --host 127.0.0.1 --port 4173 --strictPort 1^> demo-preview.log 2^>^&1' -WorkingDirectory '%~dp0' -WindowStyle Hidden -PassThru; Set-Content -LiteralPath '.myroomie-demo.pid' -Value $p.Id"
+if exist ".myroomie-v1-frontend.pid" goto already_running
+if exist ".myroomie-v1-backend.pid" goto already_running
+powershell -NoProfile -Command "$node=(Get-Command node.exe).Source; $b=Start-Process -FilePath $node -ArgumentList 'server/photoVisionServer.mjs' -WorkingDirectory '%~dp0' -WindowStyle Hidden -RedirectStandardOutput 'demo-backend.log' -RedirectStandardError 'demo-backend-error.log' -PassThru; Set-Content -LiteralPath '.myroomie-v1-backend.pid' -Value $b.Id; $f=Start-Process -FilePath $node -ArgumentList 'node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port','4180','--strictPort' -WorkingDirectory '%~dp0' -WindowStyle Hidden -RedirectStandardOutput 'demo-preview.log' -RedirectStandardError 'demo-preview-error.log' -PassThru; Set-Content -LiteralPath '.myroomie-v1-frontend.pid' -Value $f.Id"
 powershell -NoProfile -Command "Start-Sleep -Seconds 3"
-start "" "http://127.0.0.1:4173/"
-echo MYROOMIE Demo: http://127.0.0.1:4173/
-endlocal
+start "" "http://127.0.0.1:4180/"
+echo MYROOMIE Final V1: http://127.0.0.1:4180/
+echo Decision backend: http://127.0.0.1:8787/
+exit /b 0
+:already_running
+echo MYROOMIE Final V1 may already be running. Run STOP_MYROOMIE_DEMO.bat first.
+exit /b 1

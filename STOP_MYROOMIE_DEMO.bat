@@ -1,12 +1,15 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 cd /d "%~dp0"
-if not exist ".myroomie-demo.pid" (
-  echo MYROOMIE Demo is not running.
-  exit /b 0
+if exist ".myroomie-v1-frontend.pid" (
+  set /p MYROOMIE_V1_FRONTEND_PID=<".myroomie-v1-frontend.pid"
+  taskkill /PID !MYROOMIE_V1_FRONTEND_PID! /T /F >nul 2>&1
+  del /q ".myroomie-v1-frontend.pid"
 )
-set /p MYROOMIE_PID=<".myroomie-demo.pid"
-taskkill /PID %MYROOMIE_PID% /T /F >nul 2>&1
-del /q ".myroomie-demo.pid"
-echo MYROOMIE Demo stopped.
+if exist ".myroomie-v1-backend.pid" (
+  set /p MYROOMIE_V1_BACKEND_PID=<".myroomie-v1-backend.pid"
+  taskkill /PID !MYROOMIE_V1_BACKEND_PID! /T /F >nul 2>&1
+  del /q ".myroomie-v1-backend.pid"
+)
+echo MYROOMIE Final V1 stopped.
 endlocal

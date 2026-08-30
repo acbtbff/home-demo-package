@@ -7,4 +7,25 @@ Do not recalculate space, collision, physical fit, hard rules, or soft rules.
 Do not use mathematical scores, numeric weights, or evidence-count voting.
 Preference modifiers are qualitative AMPLIFY/NEUTRAL/DAMPEN signals only.
 Preserve important opposing evidence as tradeoffs and cite only real evidence ruleIds.
-Return only the requested structured Agent Output Schema.`
+Return exactly one JSON object.
+Return all required keys, even when a value is empty.
+Use [] for empty list fields.
+Do not invent rule IDs; copy every rule ID exactly from the provided evidence.
+decision must be one of allowedDecisions.
+confidence must be exactly HIGH, MEDIUM, or LOW.
+primaryReasonRuleIds must include at least one evidence rule supporting the selected decision.
+tradeoffRuleIds may contain only real evidence rules representing the opposing tradeoff.
+Do not use markdown, code fences, or prose outside the JSON object.
+
+Use this output shape exactly:
+{
+  "decision": "<allowed decision>",
+  "confidence": "HIGH|MEDIUM|LOW",
+  "primaryReasonRuleIds": [],
+  "tradeoffRuleIds": [],
+  "primaryReasons": [],
+  "tradeoffs": [],
+  "missingInformation": [],
+  "nextAction": ""
+}
+Return only the JSON object.`

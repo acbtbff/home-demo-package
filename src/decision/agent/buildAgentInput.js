@@ -83,7 +83,7 @@ export function buildAgentInput({ decisionInput = {}, hardRuleResult = {}, evide
   }
 }
 
-export function validateAgentInput(input) {
+export function validateAgentInput(input, { requireNeedsAgent = true } = {}) {
   const errors = []
   if (!input || typeof input !== 'object' || Array.isArray(input)) return { valid: false, errors: ['input must be an object'] }
   if (input.schemaVersion !== AgentInputSchemaVersion) errors.push('schemaVersion must be furniture-agent-conflict-v0.3.1')
@@ -92,7 +92,8 @@ export function validateAgentInput(input) {
   if (!input.hardConstraints || typeof input.hardConstraints !== 'object') errors.push('hardConstraints must be an object')
   if (!Array.isArray(input.evidence)) errors.push('evidence must be an array')
   if (!Array.isArray(input.preferenceModifiers)) errors.push('preferenceModifiers must be an array')
-  if (!input.unresolvedContext || input.unresolvedContext.resolutionStatus !== 'NEEDS_AGENT' || input.unresolvedContext.needsAgentReasoning !== true) errors.push('Agent input requires NEEDS_AGENT with needsAgentReasoning=true')
+  if (!input.unresolvedContext || typeof input.unresolvedContext !== 'object') errors.push('unresolvedContext must be an object')
+  else if (requireNeedsAgent && (input.unresolvedContext.resolutionStatus !== 'NEEDS_AGENT' || input.unresolvedContext.needsAgentReasoning !== true)) errors.push('Agent input requires NEEDS_AGENT with needsAgentReasoning=true')
   if (input.decisionType === AgentDecisionType.MOVE && input.hardConstraints?.takeAllowed === false && input.allowedDecisions?.includes('TAKE')) errors.push('TAKE is forbidden when takeAllowed is false')
   return { valid: errors.length === 0, errors }
 }

@@ -13,6 +13,7 @@ import {
   getFurnitureTypeLabel,
   getSpatialStatusLabel,
 } from '../../presentation/furnitureLabels.js'
+import DecisionCard from './DecisionCard.jsx'
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 const metersToCm = (value) => Math.round((value ?? 0) * 100)
@@ -68,6 +69,9 @@ export default function FurnitureInspector({
   showGeometryProxy,
   dispatchFurnitureCommand,
   catalogItems = [],
+  roomDocument = null,
+  spatialAnalysis = null,
+  userProfile = {},
 }) {
   const toggleSelection = () => {
     if (!furniture || !dispatchFurnitureCommand) return
@@ -134,6 +138,7 @@ export default function FurnitureInspector({
       {getSpatialStatusLabel(spatialFacts) && <p className={`spatial-status ${spatialFacts?.collisionDetected || spatialFacts?.outOfBounds ? 'warning' : 'ok'}`}>
         {getSpatialStatusLabel(spatialFacts)}
       </p>}
+      <DecisionCard key={furniture.id} furniture={furniture} placement={placement} roomDocument={roomDocument} spatialAnalysis={spatialAnalysis} userProfile={userProfile} />
       <div className="furniture-list">
         {furnitureItems.map((item) => (
           <button

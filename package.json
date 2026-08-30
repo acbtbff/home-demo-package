@@ -13,7 +13,8 @@
     "lint": "oxlint",
     "report:furniture-coverage": "node scripts/reportFurnitureCoverage.mjs",
     "preview": "vite preview",
-    "test:contracts": "node --test tests/*.test.mjs"
+    "test:contracts": "node --test tests/*.test.mjs",
+    "test:agent:live": "node scripts/testAgentLive.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

@@ -119,6 +119,8 @@ export default function RoomPage() {
           showGeometryProxy={furnitureWorkspace.showGeometryProxy}
           dispatchFurnitureCommand={furnitureWorkspace.dispatchInteractionCommand}
           catalogItems={FURNITURE_CATALOG_V0}
+          roomDocument={document}
+          spatialAnalysis={furnitureWorkspace.spatialAnalysis}
         />}
       </aside>
       <div className="legend"><span className="orange-dot" />家具左键拖动 · Shift/右键拖家具旋转 · 橙色手柄改房间 · 滚轮缩放</div>

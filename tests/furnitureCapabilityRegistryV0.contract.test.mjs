@@ -36,9 +36,10 @@ test('ready capabilities have real handlers or ready assets', () => {
 })
 
 test('planned and fallback-only capabilities are honest', () => {
-  assert.equal(getFurnitureCapability('DOUBLE_BED').capabilityStatus, CAPABILITY_STATUS.PLANNED)
-  assert.equal(getFurnitureCapability('DOUBLE_BED').handler, null)
-  assert.equal(getFurnitureCapability('CABINET').capabilityStatus, CAPABILITY_STATUS.PLANNED)
+  assert.equal(getFurnitureCapability('BOOKSHELF').capabilityStatus, CAPABILITY_STATUS.PLANNED)
+  assert.equal(getFurnitureCapability('BOOKSHELF').handler, null)
+  assert.equal(getFurnitureCapability('DOUBLE_BED').capabilityStatus, CAPABILITY_STATUS.READY)
+  assert.equal(getFurnitureCapability('CABINET').capabilityStatus, CAPABILITY_STATUS.READY)
   assert.equal(getFurnitureCapability('OTHER').capabilityStatus, CAPABILITY_STATUS.FALLBACK_ONLY)
   assert.equal(routeFurnitureModelStrategy('unknown long tail'), MODEL_STRATEGIES.GENERATED)
 })
@@ -57,8 +58,8 @@ test('router and resolver are separated and preserve physical facts', () => {
   assert.deepEqual(furniture.physical.dimensionsM, before)
   assert.deepEqual(createGeometryProxyFromFurniture(furniture).dimensionsM, before)
 
-  const bed = createFurniture({ semantic: { archetype: 'DOUBLE_BED' }, physical: { dimensionsM: { width: 1.6, depth: 2, height: 0.45 } } })
-  const bedResolution = resolveFurnitureModel(bed)
+  const bookshelf = createFurniture({ semantic: { archetype: 'BOOKSHELF' }, physical: { dimensionsM: { width: 0.8, depth: 0.3, height: 1.8 } } })
+  const bedResolution = resolveFurnitureModel(bookshelf)
   assert.equal(bedResolution.strategy, MODEL_STRATEGIES.PARAMETRIC)
   assert.equal(bedResolution.status, 'PENDING')
   assert.equal(bedResolution.visualModelAvailable, false)
@@ -68,7 +69,7 @@ test('router and resolver are separated and preserve physical facts', () => {
 test('coverage report exposes status counts for developers', () => {
   const report = getFurnitureCapabilityReport()
   assert.equal(report.total, Object.keys(FURNITURE_CAPABILITY_REGISTRY_V0).length)
-  assert.equal(report.counts.READY, 4)
+  assert.equal(report.counts.READY, 8)
   assert.ok(report.counts.PLANNED > 0)
   assert.ok(report.counts.FALLBACK_ONLY >= 2)
 })

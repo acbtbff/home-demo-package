@@ -1,4 +1,5 @@
 import { createParametricDeskSpec } from './parametricDesk.js'
+import { PARAMETRIC_FURNITURE_GENERATORS_V0 } from './parametricFurniture.js'
 import { normalizeFurnitureSemantic } from './furnitureSemantic.js'
 import {
   FLOOR_LAMP_LIBRARY_ASSET_V0,
@@ -40,6 +41,30 @@ export const PARAMETRIC_GENERATOR_REGISTRY_V0 = Object.freeze({
     status: CAPABILITY_STATUS.READY,
     handler: createParametricDeskSpec,
   }),
+  NIGHTSTAND: Object.freeze({
+    key: 'NIGHTSTAND',
+    archetype: FURNITURE_ARCHETYPES.NIGHTSTAND,
+    status: CAPABILITY_STATUS.READY,
+    handler: PARAMETRIC_FURNITURE_GENERATORS_V0.NIGHTSTAND,
+  }),
+  DOUBLE_BED: Object.freeze({
+    key: 'DOUBLE_BED',
+    archetype: FURNITURE_ARCHETYPES.DOUBLE_BED,
+    status: CAPABILITY_STATUS.READY,
+    handler: PARAMETRIC_FURNITURE_GENERATORS_V0.DOUBLE_BED,
+  }),
+  CABINET: Object.freeze({
+    key: 'CABINET',
+    archetype: FURNITURE_ARCHETYPES.CABINET,
+    status: CAPABILITY_STATUS.READY,
+    handler: PARAMETRIC_FURNITURE_GENERATORS_V0.CABINET,
+  }),
+  COFFEE_TABLE: Object.freeze({
+    key: 'COFFEE_TABLE',
+    archetype: FURNITURE_ARCHETYPES.COFFEE_TABLE,
+    status: CAPABILITY_STATUS.READY,
+    handler: PARAMETRIC_FURNITURE_GENERATORS_V0.COFFEE_TABLE,
+  }),
 })
 
 export const LIBRARY_ASSET_POOL_REGISTRY_V0 = Object.freeze({
@@ -49,10 +74,12 @@ export const LIBRARY_ASSET_POOL_REGISTRY_V0 = Object.freeze({
 })
 
 const PARAMETRIC_PLANNED = new Set([
-  'DINING_TABLE', 'COFFEE_TABLE', 'ROUND_COFFEE_TABLE', 'SINGLE_BED', 'DOUBLE_BED',
-  'WARDROBE', 'BOOKSHELF', 'CABINET', 'NIGHTSTAND', 'DESK_PEDESTAL',
+  'DINING_TABLE', 'ROUND_COFFEE_TABLE', 'SINGLE_BED',
+  'WARDROBE', 'BOOKSHELF', 'DESK_PEDESTAL',
   'CHEST_OF_DRAWERS', 'OPEN_BOOKSHELF', 'GARMENT_RACK', 'AREA_RUG',
 ])
+
+const PARAMETRIC_READY = new Set(['COFFEE_TABLE', 'DOUBLE_BED', 'CABINET', 'NIGHTSTAND'])
 
 const LIBRARY_PLANNED = new Set([
   'DINING_CHAIR', 'STOOL', 'THREE_SEAT_SOFA', 'REFRIGERATOR', 'WASHING_MACHINE',
@@ -61,7 +88,7 @@ const LIBRARY_PLANNED = new Set([
 
 const strategyForArchetype = (archetype) => {
   if (archetype === FURNITURE_ARCHETYPES.OTHER || archetype === FURNITURE_ARCHETYPES.LADDER_SPECIAL) return MODEL_STRATEGIES.GENERATED
-  if (archetype === FURNITURE_ARCHETYPES.DESK || PARAMETRIC_PLANNED.has(archetype)) return MODEL_STRATEGIES.PARAMETRIC
+  if (archetype === FURNITURE_ARCHETYPES.DESK || PARAMETRIC_PLANNED.has(archetype) || PARAMETRIC_READY.has(archetype)) return MODEL_STRATEGIES.PARAMETRIC
   if (LIBRARY_ASSET_POOL_REGISTRY_V0[archetype] || LIBRARY_PLANNED.has(archetype)) return MODEL_STRATEGIES.LIBRARY
   return MODEL_STRATEGIES.GENERATED
 }

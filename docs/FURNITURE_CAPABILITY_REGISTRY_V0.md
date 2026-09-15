@@ -10,25 +10,25 @@ The router selects a production strategy. The resolver selects the concrete gene
 
 ## Coverage Matrix
 
-The registry contains every legal V0 taxonomy archetype. `READY` means a real handler or a real ready asset is available now. `PLANNED` records the intended route without inventing a handler or asset. `FALLBACK_ONLY` means the archetype is recognized but currently has only a safe fallback route.
+The registry contains every legal V0 taxonomy archetype. `READY` means a real handler or a real ready asset is available now. `PLANNED` records the intended route without inventing a handler or asset. `FALLBACK_ONLY` means the archetype is recognized but currently has only a safe fallback route. Demo Furniture Coverage V0 adds four reusable parametric handlers, bringing the real READY count from 4 to 8.
 
 | Category | Archetype | Preferred strategy | Status | Current handler / asset | Fallback |
 | --- | --- | --- | --- | --- | --- |
 | TABLE | DESK | PARAMETRIC | READY | `DESK` / `createParametricDeskSpec` | — |
 | TABLE | DINING_TABLE | PARAMETRIC | PLANNED | none | PROXY_ONLY |
-| TABLE | COFFEE_TABLE | PARAMETRIC | PLANNED | none | PROXY_ONLY |
+| TABLE | COFFEE_TABLE | PARAMETRIC | READY | `COFFEE_TABLE` / `createParametricCoffeeTableSpec` | — |
 | TABLE | ROUND_COFFEE_TABLE | PARAMETRIC | PLANNED | none | PROXY_ONLY |
 | CHAIR | OFFICE_CHAIR | LIBRARY | READY | `office-chair-local-v0` | — |
 | CHAIR | DINING_CHAIR | LIBRARY | PLANNED | none | PROXY_ONLY |
 | CHAIR | STOOL | LIBRARY | PLANNED | none | PROXY_ONLY |
 | BED | SINGLE_BED | PARAMETRIC | PLANNED | none | PROXY_ONLY |
-| BED | DOUBLE_BED | PARAMETRIC | PLANNED | none | PROXY_ONLY |
+| BED | DOUBLE_BED | PARAMETRIC | READY | `DOUBLE_BED` / `createParametricDoubleBedSpec` | — |
 | SOFA | TWO_SEAT_SOFA | LIBRARY | READY | `two-seat-sofa-local-v0` | — |
 | SOFA | THREE_SEAT_SOFA | LIBRARY | PLANNED | none | PROXY_ONLY |
 | STORAGE | WARDROBE | PARAMETRIC | PLANNED | none | PROXY_ONLY |
 | STORAGE | BOOKSHELF | PARAMETRIC | PLANNED | none | PROXY_ONLY |
-| STORAGE | CABINET | PARAMETRIC | PLANNED | none | PROXY_ONLY |
-| STORAGE | NIGHTSTAND | PARAMETRIC | PLANNED | none | PROXY_ONLY |
+| STORAGE | CABINET | PARAMETRIC | READY | `CABINET` / `createParametricCabinetSpec` | — |
+| STORAGE | NIGHTSTAND | PARAMETRIC | READY | `NIGHTSTAND` / `createParametricNightstandSpec` | — |
 | STORAGE | DESK_PEDESTAL | PARAMETRIC | PLANNED | none | PROXY_ONLY |
 | STORAGE | CHEST_OF_DRAWERS | PARAMETRIC | PLANNED | none | PROXY_ONLY |
 | STORAGE | OPEN_BOOKSHELF | PARAMETRIC | PLANNED | none | PROXY_ONLY |
@@ -42,7 +42,7 @@ The registry contains every legal V0 taxonomy archetype. `READY` means a real ha
 | SPECIAL | LADDER_SPECIAL | GENERATED | FALLBACK_ONLY | provider pending | GENERATED_PENDING / PROXY_ONLY |
 | OTHER | OTHER | GENERATED | FALLBACK_ONLY | provider pending | GENERATED_PENDING / PROXY_ONLY |
 
-Current real READY capabilities are exactly DESK, OFFICE_CHAIR, TWO_SEAT_SOFA, and FLOOR_LAMP. No new GLB or parametric generator is added in V0.
+Current real READY capabilities are DESK, OFFICE_CHAIR, TWO_SEAT_SOFA, FLOOR_LAMP, NIGHTSTAND, DOUBLE_BED, CABINET, and COFFEE_TABLE. The four new parametric handlers consume `Furniture.physical.dimensionsM` and preserve the shared visual/geometry-proxy contract. No new GLB assets are added.
 
 ## Generated and proxy fallback policy
 

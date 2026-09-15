@@ -7,7 +7,7 @@ import { createCreateFurnitureCommand, createCreatePlacementCommand } from '../.
 const MAX_FILE_BYTES = 10 * 1024 * 1024
 const OPTIONS = [
   ['DESK', '书桌'], ['OFFICE_CHAIR', '办公椅'], ['TWO_SEAT_SOFA', '沙发'], ['FLOOR_LAMP', '落地灯'],
-  ['CABINET', '柜子'], ['BOOKSHELF', '书架'], ['SINGLE_BED', '床'], ['NIGHTSTAND', '床头柜'], ['OTHER', '其他'],
+  ['COFFEE_TABLE', '茶几'], ['CABINET', '柜子'], ['BOOKSHELF', '书架'], ['SINGLE_BED', '床'], ['DOUBLE_BED', '双人床'], ['NIGHTSTAND', '床头柜'], ['OTHER', '其他'],
 ]
 
 export default function FurnitureIntakePanel({ workspace, onClose }) {

@@ -69,12 +69,12 @@ test('wishlist edits and purchase preserve spatial identity and strategy', () =>
 })
 
 test('planned and generated routes remain honest in the integrated chain', () => {
-  const bed = createFurniture({ semantic: { archetype: 'DOUBLE_BED' }, physical: { dimensionsM: { width: 1.6, depth: 2, height: 0.45 } } })
-  const bedCapability = getFurnitureCapability(bed)
-  const bedResolution = resolveFurnitureModel(bed)
-  assert.equal(bedCapability.capabilityStatus, CAPABILITY_STATUS.PLANNED)
-  assert.equal(bedResolution.visualModelAvailable, false)
-  assert.equal(bedResolution.fallback, 'PROXY_ONLY')
+  const bookshelf = createFurniture({ semantic: { archetype: 'BOOKSHELF' }, physical: { dimensionsM: { width: 0.8, depth: 0.3, height: 1.8 } } })
+  const bookshelfCapability = getFurnitureCapability(bookshelf)
+  const bookshelfResolution = resolveFurnitureModel(bookshelf)
+  assert.equal(bookshelfCapability.capabilityStatus, CAPABILITY_STATUS.PLANNED)
+  assert.equal(bookshelfResolution.visualModelAvailable, false)
+  assert.equal(bookshelfResolution.fallback, 'PROXY_ONLY')
 
   const special = createFurniture({ semantic: { archetype: 'SPECIAL_UNKNOWN' }, physical: { dimensionsM: { width: 1, depth: 1, height: 1 } } })
   const specialResolution = resolveFurnitureModel(special)

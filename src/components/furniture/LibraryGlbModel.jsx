@@ -1,12 +1,13 @@
 import { useGLTF } from '@react-three/drei'
 import { useMemo } from 'react'
 import { Box3, Color, Vector3 } from 'three'
+import { calculateLibraryVisualCalibration } from '../../domain/furnitureAssets.js'
 
 const WARNING_COLOR = new Color('#ef4444')
 
 export default function LibraryGlbModel({ furniture, asset, warning = false }) {
   const { scene } = useGLTF(asset.modelUrl)
-  const { model, offset, scale } = useMemo(() => {
+  const { model, offset, scale, aspectRatioWarning } = useMemo(() => {
     const cloned = scene.clone(true)
     const normalization = asset.normalization
     cloned.rotation.set(
@@ -21,6 +22,10 @@ export default function LibraryGlbModel({ furniture, asset, warning = false }) {
     const size = bounds.getSize(new Vector3())
     const center = bounds.getCenter(new Vector3())
     const dimensions = furniture.physical.dimensionsM
+    const calibration = calculateLibraryVisualCalibration({
+      assetDimensionsM: { width: size.x, depth: size.z, height: size.y },
+      targetDimensionsM: dimensions,
+    })
 
     cloned.traverse((object) => {
       if (!object.isMesh) return
@@ -38,11 +43,8 @@ export default function LibraryGlbModel({ furniture, asset, warning = false }) {
     return {
       model: cloned,
       offset: [-center.x, -bounds.min.y, -center.z],
-      scale: [
-        dimensions.width / size.x,
-        dimensions.height / size.y,
-        dimensions.depth / size.z,
-      ],
+      scale: calibration.scale ?? [1, 1, 1],
+      aspectRatioWarning: calibration.severeAspectMismatch,
     }
   }, [asset.normalization, furniture.physical.dimensionsM, scene, warning])
 
@@ -50,7 +52,7 @@ export default function LibraryGlbModel({ furniture, asset, warning = false }) {
     <group
       name={`visual-model:${String(furniture.modelStrategy.resolved ?? 'glb').toLowerCase()}-${furniture.semantic.archetype.toLowerCase()}`}
       scale={scale}
-      userData={{ visualModel: true, strategy: furniture.modelStrategy.resolved, archetype: furniture.semantic.archetype, assetId: asset.id }}
+      userData={{ visualModel: true, strategy: furniture.modelStrategy.resolved, archetype: furniture.semantic.archetype, assetId: asset.id, aspectRatioWarning: Boolean(aspectRatioWarning) }}
     >
       <primitive object={model} position={offset} />
     </group>

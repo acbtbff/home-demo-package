@@ -7,6 +7,30 @@ export const MODEL_STRATEGIES = Object.freeze({
   GENERATED: 'GENERATED',
 })
 
+// Validation state is deliberately separate from the strategy enum. GENERATED
+// remains a reserved interface until a real generated asset is integrated.
+export const MODEL_STRATEGY_VALIDATION_STATUS = Object.freeze({
+  PARAMETRIC: 'VALIDATED',
+  LIBRARY: 'VALIDATED',
+  GENERATED: 'VALIDATION_PENDING',
+})
+
+export const GENERATED_ROUTE_STATUS = Object.freeze({
+  interface: 'INTERFACE_RESERVED',
+  validation: 'VALIDATION_PENDING',
+})
+
+export const MODEL_STRATEGY_STATUS = Object.freeze({
+  ...MODEL_STRATEGY_VALIDATION_STATUS,
+  GENERATED_INTERFACE: GENERATED_ROUTE_STATUS.interface,
+})
+
+export const FURNITURE_PIPELINE_STATUS = Object.freeze({
+  PARAMETRIC: 'VALIDATED',
+  LIBRARY: 'VALIDATED',
+  GENERATED: 'INTERFACE_RESERVED / VALIDATION_PENDING',
+})
+
 export const MODEL_STRATEGY_BY_ARCHETYPE = Object.freeze({
   [FURNITURE_ARCHETYPES.DOUBLE_BED]: MODEL_STRATEGIES.PARAMETRIC,
   [FURNITURE_ARCHETYPES.DESK]: MODEL_STRATEGIES.PARAMETRIC,

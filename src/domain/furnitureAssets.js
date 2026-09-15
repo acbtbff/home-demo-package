@@ -155,6 +155,36 @@ export const FLOOR_LAMP_LIBRARY_ASSET_V0 = createAssetContract({
   },
 })
 
+export const NIGHTSTAND_LIBRARY_ASSET_V0 = createAssetContract({
+  id: 'nightstand-library-v0',
+  archetype: 'NIGHTSTAND',
+  modelUrl: '/assets/furniture/nightstand-library-v0.glb',
+  referenceDimensionsM: { width: 1.64, depth: 0.82, height: 1.0 },
+  styleFamily: 'COZY_V0',
+  source: ASSET_SOURCES.LOCAL,
+  status: ASSET_STATUSES.READY,
+})
+
+export const DOUBLE_BED_LIBRARY_ASSET_V0 = createAssetContract({
+  id: 'double-bed-library-v0',
+  archetype: 'DOUBLE_BED',
+  modelUrl: '/assets/furniture/double-bed-library-v0.glb',
+  referenceDimensionsM: { width: 1.66, depth: 1.27, height: 1.73 },
+  styleFamily: 'COZY_V0',
+  source: ASSET_SOURCES.LOCAL,
+  status: ASSET_STATUSES.READY,
+})
+
+export const CABINET_LIBRARY_ASSET_V0 = createAssetContract({
+  id: 'cabinet-library-v0',
+  archetype: 'CABINET',
+  modelUrl: '/assets/furniture/cabinet-library-v0.glb',
+  referenceDimensionsM: { width: 1.50, depth: 0.99, height: 1.60 },
+  styleFamily: 'COZY_V0',
+  source: ASSET_SOURCES.LOCAL,
+  status: ASSET_STATUSES.READY,
+})
+
 // GENERATED V0 remains a deliberate integration slot. The prior photo-to-3D
 // experiment is not part of this handoff package, so the asset is explicitly
 // UNAVAILABLE rather than silently replaced by a fake model.
@@ -172,6 +202,9 @@ export const DEFAULT_ASSET_REGISTRY_V0 = Object.freeze([
   OFFICE_CHAIR_LIBRARY_ASSET_V0,
   TWO_SEAT_SOFA_LIBRARY_ASSET_V0,
   FLOOR_LAMP_LIBRARY_ASSET_V0,
+  NIGHTSTAND_LIBRARY_ASSET_V0,
+  DOUBLE_BED_LIBRARY_ASSET_V0,
+  CABINET_LIBRARY_ASSET_V0,
   LADDER_SPECIAL_GENERATED_ASSET_PENDING_V0,
 ])
 

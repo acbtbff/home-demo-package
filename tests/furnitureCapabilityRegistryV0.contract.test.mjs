@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
 import test from 'node:test'
 import {
   CAPABILITY_STATUS,
@@ -33,12 +35,22 @@ test('ready capabilities have real handlers or ready assets', () => {
   assert.equal(getFurnitureCapability('DESK').generatorKey, 'DESK')
   assert.equal(getFurnitureCapability('OFFICE_CHAIR').assetPool, LIBRARY_ASSET_POOL_REGISTRY_V0.OFFICE_CHAIR)
   assert.equal(PARAMETRIC_GENERATOR_REGISTRY_V0.DESK.status, CAPABILITY_STATUS.READY)
+  for (const asset of [
+    ...LIBRARY_ASSET_POOL_REGISTRY_V0.DOUBLE_BED,
+    ...LIBRARY_ASSET_POOL_REGISTRY_V0.CABINET,
+    ...LIBRARY_ASSET_POOL_REGISTRY_V0.NIGHTSTAND,
+  ]) {
+    assert.equal(asset.status, 'READY')
+    assert.ok(asset.modelUrl)
+    assert.equal(fs.existsSync(path.join(process.cwd(), 'public', asset.modelUrl.slice(1))), true)
+  }
 })
 
 test('planned and fallback-only capabilities are honest', () => {
-  assert.equal(getFurnitureCapability('DOUBLE_BED').capabilityStatus, CAPABILITY_STATUS.PLANNED)
+  assert.equal(getFurnitureCapability('DOUBLE_BED').capabilityStatus, CAPABILITY_STATUS.READY)
   assert.equal(getFurnitureCapability('DOUBLE_BED').handler, null)
-  assert.equal(getFurnitureCapability('CABINET').capabilityStatus, CAPABILITY_STATUS.PLANNED)
+  assert.equal(getFurnitureCapability('CABINET').capabilityStatus, CAPABILITY_STATUS.READY)
+  assert.equal(getFurnitureCapability('NIGHTSTAND').capabilityStatus, CAPABILITY_STATUS.READY)
   assert.equal(getFurnitureCapability('OTHER').capabilityStatus, CAPABILITY_STATUS.FALLBACK_ONLY)
   assert.equal(routeFurnitureModelStrategy('unknown long tail'), MODEL_STRATEGIES.GENERATED)
 })
@@ -59,16 +71,16 @@ test('router and resolver are separated and preserve physical facts', () => {
 
   const bed = createFurniture({ semantic: { archetype: 'DOUBLE_BED' }, physical: { dimensionsM: { width: 1.6, depth: 2, height: 0.45 } } })
   const bedResolution = resolveFurnitureModel(bed)
-  assert.equal(bedResolution.strategy, MODEL_STRATEGIES.PARAMETRIC)
-  assert.equal(bedResolution.status, 'PENDING')
-  assert.equal(bedResolution.visualModelAvailable, false)
-  assert.equal(bedResolution.fallback, 'PROXY_ONLY')
+  assert.equal(bedResolution.strategy, MODEL_STRATEGIES.LIBRARY)
+  assert.equal(bedResolution.status, 'AVAILABLE')
+  assert.equal(bedResolution.visualModelAvailable, true)
+  assert.equal(bedResolution.asset.id, 'double-bed-library-v0')
 })
 
 test('coverage report exposes status counts for developers', () => {
   const report = getFurnitureCapabilityReport()
   assert.equal(report.total, Object.keys(FURNITURE_CAPABILITY_REGISTRY_V0).length)
-  assert.equal(report.counts.READY, 4)
+  assert.equal(report.counts.READY, 7)
   assert.ok(report.counts.PLANNED > 0)
   assert.ok(report.counts.FALLBACK_ONLY >= 2)
 })

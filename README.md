@@ -1,113 +1,63 @@
-# Rental Home Demo - Room Core
+# MYROOMIE
 
-## Project Scope
+MYROOMIE is a personal spatial-asset and living-decision product for renters. It maintains reusable digital records of rooms and furniture, then applies those facts to purchase, layout, moving, and vehicle-loading decisions.
 
-This repository is a floor-plan-first room core for rental-home layout capture.
-
-It owns this product chain:
+## Product Direction
 
 ```text
-Floor Plan Reference
-  -> FloorplanImageDraft (pixel geometry)
-  -> User scale calibration
-  -> RoomDocument (meters)
-  -> 2D Floor Plan
-  -> Manual Correction
-  -> 3D Room
+Room digitization
+  -> Furniture digitization and verification
+  -> Personal furniture assets
+  -> Purchase and spatial decisions
+  -> Move-item selection
+  -> Vehicle loading calculation
+  -> 3D loading plan
 ```
 
-It does not own movable-object recognition, movable-object semantics, visual-resource matching, collision, gesture recognition, pricing, or decision-agent workflows. Those belong in later modules or separate branches.
+The project began as a hackathon demo, but the product direction is not limited to a demo. The current repository is being transitioned toward accurate furniture assets and practical decisions. See [PRODUCT_VISION.md](PRODUCT_VISION.md) and [ROADMAP.md](ROADMAP.md).
 
 ## Current Capabilities
 
-- Upload JPG, PNG, WebP, GIF, or SVG floor-plan images and preview them locally.
-- Parse an image into validated pixel geometry (`FloorplanImageDraft`).
-- Calibrate pixels to meters from an overall width/depth or one known wall length.
-- Convert the calibrated draft into the canonical `RoomDocument`.
-- Use a deterministic built-in floor-plan fixture for a stable end-to-end hackathon demo.
-- Optionally call the existing local Vision server for non-fixture images.
-- Create a digital room from the result and correct it in the 2D editor.
-- Set the room height in meters before entering the 3D room (2.8m by default).
-- Keep the 4-8 photo room scan implementation behind a disabled feature flag.
-- Preview and remove uploaded photos locally.
-- Use a known room-width scale anchor.
-- Run a mock room-structure analysis without a backend.
-- Keep the real Vision backend integration code for future use.
-- Convert `PhotoRoomDraft` into a canonical `RoomDocument`.
-- Render and edit an SVG 2D floor plan.
-- Select, add, delete, and edit wall segments.
-- Drag wall endpoints with endpoint-to-endpoint and endpoint-to-wall-segment snapping.
-- Keep snapping non-permanent: snapped points can still be pulled apart later.
-- Edit doors and windows along their bound walls.
-- Validate RoomDocument wall/opening geometry.
-- Show exterior-wall closure warnings without blocking 3D entry.
-- Render a 3D room from the same RoomDocument.
+- Canonical room geometry in metres through `RoomDocument`.
+- Deterministic sample floor plan, scale calibration, and 2D editing.
+- 3D room rendering from the same room document.
+- Furniture identity separated from room placement.
+- Real-scale furniture placement, movement, Y-axis rotation, collision, and out-of-bounds analysis.
+- Owned, landlord-provided, and wishlist furniture flows.
+- Furniture photo preview, type confirmation, manual dimensions, and product metadata.
+- Parametric and library-backed furniture representations.
+- Purchase and move decision-rule foundations with explicit evidence and validation.
+- Additive `FurnitureAsset V1` contract for multiple physical states, provenance, and packing readiness.
+- `Packing Contract V0` boundary for future vehicle-loading optimization.
 
-## RoomDocument Schema
+## Important Current Limits
 
-`RoomDocument v1` is pure room structure:
+- Furniture image recognition is not yet a production measurement system.
+- Critical dimensions, weight, and handling constraints still require user or source verification.
+- Live-agent, purchase-decision UI, and gesture integrations remain on development/demo branches and are not all in `main`.
+- Generated 3D furniture is a pending representation route, not a completed image-to-3D service.
+- Packing contracts exist, but a 3D bin-packing solver and truck-loading UI are not yet implemented.
+- Persistent user accounts and cloud furniture inventories are not yet implemented.
 
-```js
-{
-  schemaVersion,
-  id,
-  units,
-  coordinateSystem: {
-    handedness,
-    upAxis,
-    floorAxes,
-  },
-  source,
-  room,
-  walls,
-  openings,
-  materials,
-}
-```
+## Domain Contracts
 
-`walls[]` is the only wall data source. Each wall uses `start` and `end` points in meters on the X/Z floor plane, plus height, thickness, kind, and material.
+- [FurnitureAsset Contract V1](docs/FURNITURE_ASSET_CONTRACT_V1.md)
+- [Packing Contract V0](docs/PACKING_CONTRACT_V0.md)
+- `src/domain/furnitureSchema.js` — current compatible Furniture record
+- `src/domain/furnitureAsset.js` — long-lived physical asset facts
+- `src/domain/packingContracts.js` — solver-independent packing inputs and outputs
+- `src/domain/spatialContracts.js` — room placement and geometry proxies
 
-`openings[]` binds doors/windows to walls by `wallId` and `offset` along the wall from `wall.start`.
+## Application Routes
 
-## FloorplanImageDraft Schema
+- `/` — product entry
+- `/floorplan` — room/floor-plan workflow
+- `/room` — 3D room and furniture placement
+- `/furniture` — furniture inventory, intake, wishlist, and editing
 
-`FloorplanImageDraft v1` is the plug-in boundary for floor-plan image parsers:
+Floor-plan import and photo-room scan remain feature-flagged. The built-in room fixture provides a deterministic development path.
 
-```js
-{
-  schemaVersion: 1,
-  source: { type, provider, confidence },
-  image: { widthPixels, heightPixels },
-  bounds: { minX, minY, maxX, maxY },
-  scale: { pixelsPerMeter, confidence },
-  walls: [{ id, kind, start, end, thicknessPixels, confidence }],
-  doors: [{ id, wallId, center, widthPixels, heightMeters, confidence }],
-  windows: [{ id, wallId, center, widthPixels, heightMeters, sillHeightMeters, confidence }],
-}
-```
-
-Coordinates use image pixels with a top-left origin. The adapter refuses to create a metric `RoomDocument` until the user supplies a valid calibration length. The schema and runtime validation live in `src/domain/floorplanImageDraft.js`; the metric conversion lives in `src/adapters/floorplanImageAdapter.js`.
-
-## PhotoRoomDraft Schema
-
-`PhotoRoomDraft v1` is a room-structure draft:
-
-```js
-{
-  schemaVersion,
-  source,
-  scaleAnchor,
-  walls,
-  doors,
-  windows,
-  openings?,
-  uncertainties,
-}
-```
-
-The draft describes architectural structure only: wall geometry, doors, windows, generic openings, scale information, confidence, and uncertainty notes.
-
-## Local Running
+## Local Development
 
 Use Node.js `>=20.19`.
 
@@ -116,98 +66,17 @@ pnpm install
 pnpm dev
 ```
 
-By default, floor-plan parsing is fixture-only. Click **使用内置示例户型图**, parse it, enter its printed overall width `9.6m`, and continue into the 2D editor. The fixture image and its deterministic pixel geometry are:
-
-```text
-public/fixtures/floorplan-demo.svg
-fixtures/floorplan/demo-floorplan-draft.json
-```
-
-The parser matches the exact image content by SHA-256. A different upload does not receive fabricated geometry; the UI explains that a real Vision service is required.
-
-To enable real parsing for other raster floor plans, run the existing server with `OPENAI_API_KEY` configured and start the web app with `VITE_FLOORPLAN_VISION_MODE=real`. The browser calls `POST /api/analyze-floorplan`; the response must pass the same `FloorplanImageDraft` validator before calibration is offered.
-
-The disabled photo-room workflow still uses its separate mock draft from `fixtures/photo-room/sample-draft.json` when that feature is explicitly re-enabled.
-
-The future real-Vision path is still present:
-
-```bash
-pnpm vision:server
-```
-
-That server expects `OPENAI_API_KEY` and is not required for this room-core mock flow.
-
-## Feature Flags
-
-Feature availability is controlled in `src/config/features.js`:
-
-```js
-export const FEATURES = {
-  floorplanImport: true,
-  photoRoomScan: false,
-}
-```
-
-Set `photoRoomScan` to `true` to restore the existing photo capture entry. The capture component, adapter, service, fixture, and backend code remain in the project.
-
 ## Verification
 
 ```bash
+pnpm test:contracts
 pnpm lint
 pnpm build
 ```
 
-## Key Files
+## Branch Policy
 
-```text
-rental-home-demo/
-├─ fixtures/photo-room/sample-draft.json
-├─ fixtures/floorplan/demo-floorplan-draft.json
-├─ public/fixtures/floorplan-demo.svg
-├─ server/photoVisionServer.mjs
-├─ src/
-│  ├─ App.jsx
-│  ├─ adapters/
-│  │  ├─ floorplanImageAdapter.js
-│  │  ├─ legacyDemoAdapter.js
-│  │  └─ photoRoomAdapter.js
-│  ├─ components/
-│  │  ├─ PhotoRoomCapture.jsx
-│  │  ├─ Room.jsx
-│  │  ├─ WallSegment.jsx
-│  │  └─ floorplan/
-│  │     ├─ DimensionLabel.jsx
-│  │     ├─ FloorPlanEditor.jsx
-│  │     ├─ FloorPlanImport.jsx
-│  │     ├─ Opening2D.jsx
-│  │     ├─ Wall2D.jsx
-│  │     ├─ WallHandle.jsx
-│  │     └─ floorPlanCoordinates.js
-│  ├─ data/initialRoomDocument.js
-│  ├─ domain/
-│  │  ├─ floorplanImageDraft.js
-│  │  ├─ photoRealityMetrics.js
-│  │  ├─ photoRoomDraft.js
-│  │  ├─ roomGeometry.js
-│  │  ├─ roomSchema.js
-│  │  ├─ roomValidation.js
-│  │  └─ wallTopology.js
-│  ├─ services/
-│  │  ├─ floorplanImageParser.js
-│  │  ├─ floorplanImagePrompt.js
-│  │  ├─ photoRoomPrompt.js
-│  │  └─ photoRoomVision.js
-│  └─ state/useRoomDocument.js
-├─ package.json
-├─ pnpm-lock.yaml
-└─ vite.config.js
-```
-
-## Architecture Notes
-
-- `FloorPlanEditor` and the 3D `Room` read the same `RoomDocument` and dispatch into the same reducer.
-- `floorplanImageParser.js` is the only image-parser service boundary. Replace or extend it to connect another model; the calibration, adapter, editor, validation, and 3D layers remain unchanged.
-- Validation blocks schema and geometry errors only.
-- Exterior closure analysis lives in `wallTopology.js` and remains a warning layer.
-- `snap` is coordinate alignment, not a permanent topology graph.
-- The 3D scene intentionally renders an empty architectural room: floor, walls, thickness, height, diagonal wall support, openings, and window glass.
+- `main` is the stable product branch.
+- The hackathon demo should remain available as an archive/tag.
+- Product contracts and migrations land before presentation-only features.
+- Recognition, model generation, decision agents, and packing solvers remain replaceable behind explicit interfaces.
